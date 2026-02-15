@@ -624,11 +624,14 @@
         // Initialize app
         function init() {
             loadConfig();
-            loadFromJSONBin();
-            renderStoreSelector();
-            renderLists();
-            renderStoreManager();
-            renderHistory();
+            // Always try to load from JSONBin first to sync latest data
+            loadFromJSONBin().then(() => {
+                // After loading remote data, render everything
+                renderStoreSelector();
+                renderLists();
+                renderStoreManager();
+                renderHistory();
+            });
             setupEventListeners();
         }
 
@@ -700,8 +703,10 @@
                 const response = await fetch(`${JSONBIN_BASE_URL}/b/${JSONBIN_BIN_ID}/latest`, {
                     method: 'GET',
                     headers: {
-                        'X-Master-Key': JSONBIN_API_KEY
-                    }
+                        'X-Master-Key': JSONBIN_API_KEY,
+                        'X-Bin-Meta': 'false'
+                    },
+                    cache: 'no-store' // Force fresh data, don't use cached version
                 });
 
                 if (!response.ok) {
@@ -715,13 +720,20 @@
                     appData.lists = data.record.lists || appData.lists;
                     appData.history = data.record.history || appData.history;
                     
+                    // Update UI if it's already rendered
                     renderStoreSelector();
                     renderLists();
                     renderStoreManager();
                     renderHistory();
+                    
+                    console.log('✓ Data loaded from JSONBin');
                 }
             } catch (error) {
                 console.error('Error loading from JSONBin:', error);
+                // If this is the first load and it fails, show a toast
+                if (appData.lists && Object.keys(appData.lists).length === 0) {
+                    showToast('Could not load data. Check settings.', 'error');
+                }
             }
         }
 
@@ -1158,6 +1170,23 @@
                 loadFromJSONBin();
             }
         }, 30000);
+
+        // iOS Fix: Reload data when app becomes visible
+        // This handles the case where iOS might have cleared localStorage
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && JSONBIN_API_KEY && JSONBIN_BIN_ID) {
+                console.log('App visible, reloading data...');
+                loadFromJSONBin();
+            }
+        });
+
+        // iOS Fix: Also reload on page show (handles back/forward navigation)
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted && JSONBIN_API_KEY && JSONBIN_BIN_ID) {
+                console.log('Page restored from cache, reloading data...');
+                loadFromJSONBin();
+            }
+        });
     </script>
 </body>
 </html>
