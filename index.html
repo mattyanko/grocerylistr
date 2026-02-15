@@ -614,16 +614,20 @@
         const JSONBIN_BASE_URL = 'https://api.jsonbin.io/v3';
 
         // Initialize app
-        function init() {
-            // Always try to load from JSONBin first to sync latest data
-            loadFromJSONBin().then(() => {
-                // After loading remote data, render everything
-                renderStoreSelector();
-                renderLists();
-                renderStoreManager();
-                renderHistory();
-            });
+        async function init() {
+            debugLog('App initializing...');
+            
+            // IMPORTANT: Load data from JSONBin FIRST before rendering anything
+            await loadFromJSONBin();
+            
+            // Only after data is loaded, render the UI
+            renderStoreSelector();
+            renderLists();
+            renderStoreManager();
+            renderHistory();
+            
             setupEventListeners();
+            debugLog('App initialized successfully');
         }
 
         // JSONBin.io Functions
@@ -699,41 +703,51 @@
                 }
 
                 const data = await response.json();
-                debugLog('Data received: ' + JSON.stringify(data).substring(0, 200) + '...');
+                debugLog('Full response: ' + JSON.stringify(data).substring(0, 300));
                 
                 console.log('Raw data from JSONBin:', data);
                 
+                // JSONBin v3 returns data in data.record
+                let recordData = null;
                 if (data.record) {
-                    debugLog('Processing data.record...');
+                    recordData = data.record;
+                } else if (data.stores && data.lists) {
+                    // Sometimes the data is at the root level
+                    recordData = data;
+                }
+                
+                if (recordData) {
+                    debugLog('Processing record data...');
+                    debugLog('recordData.stores: ' + JSON.stringify(recordData.stores));
+                    debugLog('recordData.lists: ' + JSON.stringify(recordData.lists));
+                    debugLog('recordData.history: ' + JSON.stringify(recordData.history));
+                    
                     console.log('Before update - stores:', appData.stores.length, 'lists:', Object.keys(appData.lists).length);
                     
-                    appData.stores = data.record.stores || appData.stores;
-                    appData.lists = data.record.lists || appData.lists;
-                    appData.history = data.record.history || appData.history;
+                    if (recordData.stores) appData.stores = recordData.stores;
+                    if (recordData.lists) appData.lists = recordData.lists;
+                    if (recordData.history) appData.history = recordData.history;
+                    
+                    debugLog('AFTER assignment - appData.stores: ' + JSON.stringify(appData.stores));
+                    debugLog('AFTER assignment - appData.lists: ' + JSON.stringify(appData.lists));
+                    debugLog('AFTER assignment - appData.history: ' + JSON.stringify(appData.history));
                     
                     debugLog('After update - Stores: ' + appData.stores.length);
                     debugLog('After update - Lists keys: ' + Object.keys(appData.lists).length);
+                    debugLog('Lists content: ' + JSON.stringify(appData.lists));
                     
                     console.log('After update - stores:', appData.stores.length, 'lists:', Object.keys(appData.lists).length);
                     console.log('Lists data:', JSON.stringify(appData.lists));
                     
-                    // Update UI if it's already rendered
-                    debugLog('Rendering UI...');
-                    renderStoreSelector();
-                    renderLists();
-                    renderStoreManager();
-                    renderHistory();
-                    
                     debugLog('✓ Data loaded successfully at ' + new Date().toLocaleTimeString());
                     console.log('✓ Data loaded from JSONBin at', new Date().toLocaleTimeString());
+                } else {
+                    debugLog('ERROR: No valid data structure found in response');
                 }
             } catch (error) {
                 debugLog('ERROR: ' + error.message);
                 console.error('Error loading from JSONBin:', error);
-                // If this is the first load and it fails, show a toast
-                if (appData.lists && Object.keys(appData.lists).length === 0) {
-                    showToast('Could not load data. Check settings.', 'error');
-                }
+                showToast('Could not load data', 'error');
             }
         }
 
@@ -1152,36 +1166,53 @@
         init();
 
         // Auto-refresh every 30 seconds to sync changes from other devices
-        setInterval(() => {
+        setInterval(async () => {
             if (JSONBIN_API_KEY && JSONBIN_BIN_ID) {
-                loadFromJSONBin();
+                await loadFromJSONBin();
+                // Re-render after loading
+                renderStoreSelector();
+                renderLists();
+                renderStoreManager();
+                renderHistory();
             }
         }, 30000);
 
         // iOS Fix: Reload data when app becomes visible (more aggressive)
-        document.addEventListener('visibilitychange', () => {
+        document.addEventListener('visibilitychange', async () => {
             if (!document.hidden && JSONBIN_API_KEY && JSONBIN_BIN_ID) {
                 console.log('App visible, reloading data...');
                 // Use setTimeout to ensure iOS has fully restored the page
-                setTimeout(() => {
-                    loadFromJSONBin();
+                setTimeout(async () => {
+                    await loadFromJSONBin();
+                    renderStoreSelector();
+                    renderLists();
+                    renderStoreManager();
+                    renderHistory();
                 }, 100);
             }
         });
 
         // iOS Fix: Also reload on page show (handles back/forward navigation)
-        window.addEventListener('pageshow', (event) => {
+        window.addEventListener('pageshow', async (event) => {
             if (JSONBIN_API_KEY && JSONBIN_BIN_ID) {
                 console.log('Page shown, reloading data...');
-                loadFromJSONBin();
+                await loadFromJSONBin();
+                renderStoreSelector();
+                renderLists();
+                renderStoreManager();
+                renderHistory();
             }
         });
 
         // iOS Fix: Reload on focus
-        window.addEventListener('focus', () => {
+        window.addEventListener('focus', async () => {
             if (JSONBIN_API_KEY && JSONBIN_BIN_ID) {
                 console.log('Window focused, reloading data...');
-                loadFromJSONBin();
+                await loadFromJSONBin();
+                renderStoreSelector();
+                renderLists();
+                renderStoreManager();
+                renderHistory();
             }
         });
 
