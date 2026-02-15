@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Lists</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2D5F3F;
+            --primary-dark: #1E4029;
+            --primary-light: #4A8B5F;
+            --accent: #F4A261;
+            --accent-hover: #E76F51;
+            --bg-main: #FAFAF8;
+            --bg-card: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-secondary: #6B6B6B;
+            --border: #E5E5E0;
+            --shadow: rgba(0, 0, 0, 0.08);
+            --success: #52B788;
+            --danger: #E63946;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border-radius: 0 0 24px 24px;
+            margin: -20px -20px 30px;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 12px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-dark);
+            font-family: 'Space Mono', monospace;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(45, 95, 63, 0.1);
+        }
+
+        .store-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .store-chip {
+            padding: 8px 16px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: var(--bg-main);
+        }
+
+        .store-chip:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .store-chip.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(45, 95, 63, 0.3);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(244, 162, 97, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+
+        .btn-danger:hover {
+            background: #C62E3A;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .list-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-family: 'Space Mono', monospace;
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .grocery-item {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            background: var(--bg-main);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .grocery-item:hover {
+            border-color: var(--border);
+            transform: translateX(4px);
+        }
+
+        .grocery-item.checked {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        .grocery-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            margin-right: 14px;
+            cursor: pointer;
+            accent-color: var(--success);
+        }
+
+        .grocery-item span {
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .grocery-item button {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            transition: all 0.2s ease;
+        }
+
+        .grocery-item button:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .store-manager-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .store-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-main);
+            border-radius: 10px;
+            border: 2px solid var(--border);
+        }
+
+        .store-item-name {
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .history-item {
+            padding: 12px 16px;
+            background: var(--bg-main);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            border-color: var(--primary-light);
+            transform: translateX(4px);
+        }
+
+        .history-item-name {
+            font-weight: 500;
+        }
+
+        .quick-add-inline {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quick-add-inline input {
+            flex: 1;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        .status-saved {
+            background: rgba(82, 183, 136, 0.2);
+            color: var(--success);
+        }
+
+        .status-saving {
+            background: rgba(244, 162, 97, 0.2);
+            color: var(--accent);
+        }
+
+        .config-section {
+            background: var(--bg-main);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .config-section h3 {
+            margin-bottom: 12px;
+            color: var(--primary-dark);
+        }
+
+        .config-section input {
+            margin-bottom: 12px;
+        }
+
+        .config-instructions {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+
+        .config-instructions code {
+            background: var(--bg-card);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            header {
+                margin: -15px -15px 20px;
+            }
+
+            .tabs {
+                gap: 4px;
+            }
+
+            .tab {
+                padding: 10px 14px;
+                font-size: 0.85rem;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .list-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-dark);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            font-weight: 500;
+            z-index: 1000;
+            animation: toastSlideUp 0.3s ease;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .toast.success {
+            background: var(--success);
+        }
+
+        .toast.error {
+            background: var(--danger);
+        }
+
+        @keyframes toastSlideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes toastFadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛒 Grocery Lists</h1>
+            <p class="subtitle">Shared shopping made simple</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="add">Add Item</button>
+            <button class="tab" data-tab="lists">My Lists</button>
+            <button class="tab" data-tab="stores">Manage Stores</button>
+            <button class="tab" data-tab="history">Item History</button>
+            <button class="tab" data-tab="settings">⚙️</button>
+        </div>
+
+        <!-- Add Item Tab -->
+        <div class="tab-content active" id="add-tab">
+            <div class="card">
+                <h2 class="card-title">Add New Item</h2>
+                <div class="input-group">
+                    <label for="item-name">Item Name</label>
+                    <input type="text" id="item-name" placeholder="e.g., Green Tea">
+                </div>
+                <div class="input-group">
+                    <label>Select Stores</label>
+                    <div class="store-selector" id="store-selector">
+                        <!-- Stores will be populated here -->
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="add-item-btn">Add to Lists</button>
+            </div>
+        </div>
+
+        <!-- Lists Tab -->
+        <div class="tab-content" id="lists-tab">
+            <div id="lists-container">
+                <!-- Lists will be populated here -->
+            </div>
+        </div>
+
+        <!-- Stores Tab -->
+        <div class="tab-content" id="stores-tab">
+            <div class="card">
+                <h2 class="card-title">Manage Stores</h2>
+                <div class="input-group">
+                    <label for="new-store-name">New Store Name</label>
+                    <input type="text" id="new-store-name" placeholder="e.g., PetSmart">
+                </div>
+                <button class="btn btn-accent" id="add-store-btn">Add Store</button>
+            </div>
+            <div class="card">
+                <h3 class="card-title">Your Stores</h3>
+                <div class="store-manager-list" id="store-list">
+                    <!-- Stores will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div class="tab-content" id="history-tab">
+            <div class="card">
+                <h2 class="card-title">All Items Ever Added</h2>
+                <div id="history-list">
+                    <!-- History items will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="card">
+                <h2 class="card-title">⚙️ Configuration</h2>
+                <div class="config-section">
+                    <h3>Setup Instructions</h3>
+                    <div class="config-instructions">
+                        <p><strong>First time setup:</strong></p>
+                        <p>1. Go to <a href="https://jsonbin.io" target="_blank">JSONBin.io</a> and create a free account</p>
+                        <p>2. Create a new bin with initial data (see README)</p>
+                        <p>3. Copy your <strong>Master Key</strong> and <strong>Bin ID</strong></p>
+                        <p>4. Enter them below and click <strong>Save</strong></p>
+                        <p>5. Your credentials will be saved in your browser - you only need to do this once per device!</p>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="api-key">JSONBin.io Master Key</label>
+                    <input type="password" id="api-key" placeholder="$2a$10...">
+                </div>
+                <div class="input-group">
+                    <label for="bin-id">Bin ID</label>
+                    <input type="text" id="bin-id" placeholder="66f1234567890abcd">
+                </div>
+                <button class="btn btn-primary" id="save-config-btn">💾 Save Configuration</button>
+                <button class="btn btn-accent btn-small" id="test-connection-btn" style="margin-left: 10px;">🔌 Test Connection</button>
+                <div id="config-status" style="margin-top: 16px; padding: 12px; border-radius: 8px; display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION
+        // ============================================
+        // Leave these as-is - credentials are stored in browser localStorage
+        let JSONBIN_API_KEY = '';
+        let JSONBIN_BIN_ID = '';
+        // ============================================
+
+        // App State
+        let appData = {
+            stores: ['Costco', 'Save-On-Foods', 'T&T Market'],
+            lists: {
+                'Costco': [],
+                'Save-On-Foods': [],
+                'T&T Market': []
+            },
+            history: []
+        };
+
+        // JSONBin.io Configuration
+        const JSONBIN_BASE_URL = 'https://api.jsonbin.io/v3';
+
+        // Initialize app
+        function init() {
+            loadConfig();
+            loadFromJSONBin();
+            renderStoreSelector();
+            renderLists();
+            renderStoreManager();
+            renderHistory();
+            setupEventListeners();
+        }
+
+        // Configuration management with localStorage
+        function saveConfig() {
+            localStorage.setItem('groceryAppConfig', JSON.stringify({
+                apiKey: JSONBIN_API_KEY,
+                binId: JSONBIN_BIN_ID
+            }));
+        }
+
+        function loadConfig() {
+            const saved = localStorage.getItem('groceryAppConfig');
+            if (saved) {
+                const config = JSON.parse(saved);
+                JSONBIN_API_KEY = config.apiKey || '';
+                JSONBIN_BIN_ID = config.binId || '';
+                
+                // Populate settings fields if they exist
+                const apiKeyInput = document.getElementById('api-key');
+                const binIdInput = document.getElementById('bin-id');
+                if (apiKeyInput) apiKeyInput.value = JSONBIN_API_KEY;
+                if (binIdInput) binIdInput.value = JSONBIN_BIN_ID;
+            }
+        }
+
+        // JSONBin.io Functions
+        async function saveToJSONBin() {
+            if (!JSONBIN_API_KEY || !JSONBIN_BIN_ID) {
+                console.log('No JSONBin config, skipping save');
+                return;
+            }
+
+            showStatus('saving');
+
+            try {
+                const response = await fetch(`${JSONBIN_BASE_URL}/b/${JSONBIN_BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_API_KEY
+                    },
+                    body: JSON.stringify({
+                        stores: appData.stores,
+                        lists: appData.lists,
+                        history: appData.history
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save to JSONBin');
+                }
+
+                showStatus('saved');
+            } catch (error) {
+                console.error('Error saving to JSONBin:', error);
+                showToast('Error syncing. Check settings.', 'error');
+                showStatus('');
+            }
+        }
+
+        async function loadFromJSONBin() {
+            if (!JSONBIN_API_KEY || !JSONBIN_BIN_ID) {
+                console.log('No JSONBin config, using default data');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${JSONBIN_BASE_URL}/b/${JSONBIN_BIN_ID}/latest`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': JSONBIN_API_KEY
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load from JSONBin');
+                }
+
+                const data = await response.json();
+                
+                if (data.record) {
+                    appData.stores = data.record.stores || appData.stores;
+                    appData.lists = data.record.lists || appData.lists;
+                    appData.history = data.record.history || appData.history;
+                    
+                    renderStoreSelector();
+                    renderLists();
+                    renderStoreManager();
+                    renderHistory();
+                }
+            } catch (error) {
+                console.error('Error loading from JSONBin:', error);
+            }
+        }
+
+        function showStatus(status) {
+            const badges = document.querySelectorAll('.status-badge');
+            badges.forEach(badge => badge.remove());
+
+            if (status) {
+                const badge = document.createElement('span');
+                badge.className = `status-badge status-${status}`;
+                badge.textContent = status === 'saving' ? 'Saving...' : 'Saved ✓';
+                document.querySelector('h1').appendChild(badge);
+
+                if (status === 'saved') {
+                    setTimeout(() => badge.remove(), 2000);
+                }
+            }
+        }
+
+        function showConfigStatus(message, type) {
+            const statusDiv = document.getElementById('config-status');
+            if (!statusDiv) return;
+            
+            statusDiv.style.display = 'block';
+            statusDiv.textContent = message;
+            statusDiv.style.background = type === 'success' ? 'rgba(82, 183, 136, 0.2)' : 
+                                        type === 'error' ? 'rgba(230, 57, 70, 0.2)' : 
+                                        'rgba(244, 162, 97, 0.2)';
+            statusDiv.style.color = type === 'success' ? 'var(--success)' : 
+                                   type === 'error' ? 'var(--danger)' : 
+                                   'var(--accent)';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'success') {
+            // Remove any existing toasts
+            const existingToasts = document.querySelectorAll('.toast');
+            existingToasts.forEach(toast => toast.remove());
+
+            // Create new toast
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            // Auto remove after 2.5 seconds
+            setTimeout(() => {
+                toast.style.animation = 'toastFadeOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        // Tab Navigation
+        function setupEventListeners() {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+
+            document.getElementById('add-item-btn').addEventListener('click', addItem);
+            document.getElementById('add-store-btn').addEventListener('click', addStore);
+            document.getElementById('save-config-btn').addEventListener('click', saveConfiguration);
+            document.getElementById('test-connection-btn').addEventListener('click', testConnection);
+            
+            document.getElementById('item-name').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addItem();
+            });
+            
+            document.getElementById('new-store-name').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addStore();
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+        }
+
+        // Store Selector
+        function renderStoreSelector() {
+            const container = document.getElementById('store-selector');
+            container.innerHTML = '';
+            
+            appData.stores.forEach(store => {
+                const chip = document.createElement('div');
+                chip.className = 'store-chip';
+                chip.textContent = store;
+                chip.dataset.store = store;
+                chip.addEventListener('click', () => chip.classList.toggle('selected'));
+                container.appendChild(chip);
+            });
+        }
+
+        // Add Item
+        function addItem() {
+            const itemName = document.getElementById('item-name').value.trim();
+            if (!itemName) {
+                showToast('Please enter an item name', 'error');
+                return;
+            }
+
+            const selectedStores = Array.from(document.querySelectorAll('.store-chip.selected'))
+                .map(chip => chip.dataset.store);
+
+            if (selectedStores.length === 0) {
+                showToast('Please select at least one store', 'error');
+                return;
+            }
+
+            // Add to selected lists
+            selectedStores.forEach(store => {
+                if (!appData.lists[store].find(item => item.name === itemName)) {
+                    appData.lists[store].push({
+                        name: itemName,
+                        checked: false,
+                        id: Date.now() + Math.random()
+                    });
+                }
+            });
+
+            // Add to history if not exists
+            if (!appData.history.includes(itemName)) {
+                appData.history.push(itemName);
+            }
+
+            // Clear form
+            document.getElementById('item-name').value = '';
+            document.querySelectorAll('.store-chip.selected').forEach(chip => {
+                chip.classList.remove('selected');
+            });
+
+            saveToJSONBin();
+            renderLists();
+            renderHistory();
+
+            showToast(`✓ Added "${itemName}" to ${selectedStores.join(', ')}`);
+        }
+
+        // Render Lists
+        function renderLists() {
+            const container = document.getElementById('lists-container');
+            container.innerHTML = '';
+
+            // Filter to only show stores with items
+            const storesWithItems = appData.stores.filter(store => {
+                const items = appData.lists[store] || [];
+                return items.length > 0;
+            });
+
+            // Show empty state if no stores have items
+            if (storesWithItems.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 80px 20px;">
+                        <div class="empty-state-icon">🛒</div>
+                        <h3 style="margin-bottom: 8px;">No items in any list</h3>
+                        <p>Add items from the "Add Item" tab to get started!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            storesWithItems.forEach(store => {
+                const listCard = document.createElement('div');
+                listCard.className = 'card';
+
+                const items = appData.lists[store] || [];
+                const uncheckedCount = items.filter(item => !item.checked).length;
+
+                listCard.innerHTML = `
+                    <div class="list-header">
+                        <h3 class="list-title">${store} <span style="font-size: 0.9rem; color: var(--text-secondary);">(${uncheckedCount})</span></h3>
+                        <div class="list-actions">
+                            <button class="btn btn-danger btn-small clear-list-btn" data-store="${store}">Clear All</button>
+                        </div>
+                    </div>
+                    <div class="quick-add-inline">
+                        <input type="text" placeholder="Quick add item..." class="quick-add-input" data-store="${store}">
+                        <button class="btn btn-accent btn-small quick-add-btn" data-store="${store}">Add</button>
+                    </div>
+                    <div class="grocery-items" id="list-${store.replace(/\s+/g, '-')}">
+                    </div>
+                `;
+
+                container.appendChild(listCard);
+
+                // Render items
+                const itemsContainer = listCard.querySelector('.grocery-items');
+                itemsContainer.innerHTML = '';
+                items.forEach(item => {
+                    const itemEl = createGroceryItem(item, store);
+                    itemsContainer.appendChild(itemEl);
+                });
+
+                // Quick add functionality
+                const quickAddBtn = listCard.querySelector('.quick-add-btn');
+                const quickAddInput = listCard.querySelector('.quick-add-input');
+                
+                quickAddBtn.addEventListener('click', () => {
+                    const itemName = quickAddInput.value.trim();
+                    if (itemName) {
+                        addItemToStore(itemName, store);
+                        quickAddInput.value = '';
+                    }
+                });
+
+                quickAddInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        const itemName = quickAddInput.value.trim();
+                        if (itemName) {
+                            addItemToStore(itemName, store);
+                            quickAddInput.value = '';
+                        }
+                    }
+                });
+
+                // Clear list
+                listCard.querySelector('.clear-list-btn').addEventListener('click', () => {
+                    const itemCount = appData.lists[store].length;
+                    if (itemCount === 0) {
+                        showToast('List is already empty', 'error');
+                        return;
+                    }
+                    
+                    appData.lists[store] = [];
+                    saveToJSONBin();
+                    renderLists();
+                    showToast(`✓ Cleared all items from ${store}`);
+                });
+            });
+        }
+
+        function addItemToStore(itemName, store) {
+            if (!appData.lists[store]) {
+                appData.lists[store] = [];
+            }
+
+            if (!appData.lists[store].find(item => item.name === itemName)) {
+                appData.lists[store].push({
+                    name: itemName,
+                    checked: false,
+                    id: Date.now() + Math.random()
+                });
+
+                if (!appData.history.includes(itemName)) {
+                    appData.history.push(itemName);
+                }
+
+                saveToJSONBin();
+                renderLists();
+                renderHistory();
+            }
+        }
+
+        function createGroceryItem(item, store) {
+            const div = document.createElement('div');
+            div.className = 'grocery-item' + (item.checked ? ' checked' : '');
+            
+            div.innerHTML = `
+                <input type="checkbox" ${item.checked ? 'checked' : ''}>
+                <span>${item.name}</span>
+                <button>×</button>
+            `;
+
+            const checkbox = div.querySelector('input');
+            checkbox.addEventListener('change', () => {
+                item.checked = checkbox.checked;
+                div.classList.toggle('checked', checkbox.checked);
+                saveToJSONBin();
+            });
+
+            const deleteBtn = div.querySelector('button');
+            deleteBtn.addEventListener('click', () => {
+                const index = appData.lists[store].findIndex(i => i.id === item.id);
+                appData.lists[store].splice(index, 1);
+                saveToJSONBin();
+                renderLists();
+            });
+
+            return div;
+        }
+
+        // Store Manager
+        function renderStoreManager() {
+            const container = document.getElementById('store-list');
+            container.innerHTML = '';
+
+            appData.stores.forEach(store => {
+                const storeItem = document.createElement('div');
+                storeItem.className = 'store-item';
+                storeItem.innerHTML = `
+                    <span class="store-item-name">${store}</span>
+                    <button class="btn btn-danger btn-small delete-store-btn" data-store="${store}">Delete</button>
+                `;
+                container.appendChild(storeItem);
+
+                storeItem.querySelector('.delete-store-btn').addEventListener('click', () => {
+                    deleteStore(store);
+                });
+            });
+        }
+
+        function addStore() {
+            const storeName = document.getElementById('new-store-name').value.trim();
+            if (!storeName) {
+                showToast('Please enter a store name', 'error');
+                return;
+            }
+
+            if (appData.stores.includes(storeName)) {
+                showToast('Store already exists', 'error');
+                return;
+            }
+
+            appData.stores.push(storeName);
+            appData.lists[storeName] = [];
+            
+            document.getElementById('new-store-name').value = '';
+            
+            saveToJSONBin();
+            renderStoreSelector();
+            renderLists();
+            renderStoreManager();
+            
+            showToast(`✓ Added ${storeName}`);
+        }
+
+        function deleteStore(storeName) {
+            const itemCount = appData.lists[storeName]?.length || 0;
+            
+            appData.stores = appData.stores.filter(s => s !== storeName);
+            delete appData.lists[storeName];
+            
+            saveToJSONBin();
+            renderStoreSelector();
+            renderLists();
+            renderStoreManager();
+            
+            showToast(`✓ Deleted ${storeName}${itemCount > 0 ? ` (${itemCount} items removed)` : ''}`);
+        }
+
+        // History
+        function renderHistory() {
+            const container = document.getElementById('history-list');
+            
+            if (appData.history.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📦</div><p>No items in history yet</p></div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            appData.history.forEach(itemName => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <span class="history-item-name">${itemName}</span>
+                    <button class="btn btn-accent btn-small">Add Again</button>
+                `;
+                
+                historyItem.querySelector('button').addEventListener('click', () => {
+                    document.getElementById('item-name').value = itemName;
+                    switchTab('add');
+                });
+
+                container.appendChild(historyItem);
+            });
+        }
+
+        // Configuration
+        function saveConfiguration() {
+            const apiKey = document.getElementById('api-key').value.trim();
+            const binId = document.getElementById('bin-id').value.trim();
+
+            if (!apiKey || !binId) {
+                showConfigStatus('Please enter both API Key and Bin ID', 'error');
+                return;
+            }
+
+            JSONBIN_API_KEY = apiKey;
+            JSONBIN_BIN_ID = binId;
+            saveConfig();
+            
+            showConfigStatus('✓ Configuration saved! Your credentials are stored in your browser.', 'success');
+            
+            // Try to load data immediately
+            loadFromJSONBin();
+        }
+
+        async function testConnection() {
+            const apiKey = document.getElementById('api-key').value.trim();
+            const binId = document.getElementById('bin-id').value.trim();
+
+            if (!apiKey || !binId) {
+                showConfigStatus('Please enter both API Key and Bin ID', 'error');
+                return;
+            }
+
+            showConfigStatus('Testing connection...', 'info');
+
+            try {
+                const response = await fetch(`${JSONBIN_BASE_URL}/b/${binId}/latest`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': apiKey
+                    }
+                });
+
+                if (response.ok) {
+                    showConfigStatus('✓ Connection successful! Your configuration is working.', 'success');
+                } else {
+                    showConfigStatus('✗ Connection failed. Please check your API Key and Bin ID.', 'error');
+                }
+            } catch (error) {
+                showConfigStatus('✗ Connection error: ' + error.message, 'error');
+            }
+        }
+
+        // Start the app
+        init();
+
+        // Auto-refresh every 30 seconds to sync changes from other devices
+        setInterval(() => {
+            if (JSONBIN_API_KEY && JSONBIN_BIN_ID) {
+                loadFromJSONBin();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
