@@ -527,7 +527,6 @@
             <button class="tab" data-tab="lists">My Lists</button>
             <button class="tab" data-tab="stores">Manage Stores</button>
             <button class="tab" data-tab="history">Item History</button>
-            <button class="tab" data-tab="settings">⚙️</button>
         </div>
 
         <!-- Add Item Tab -->
@@ -582,44 +581,14 @@
                 </div>
             </div>
         </div>
-
-        <!-- Settings Tab -->
-        <div class="tab-content" id="settings-tab">
-            <div class="card">
-                <h2 class="card-title">⚙️ Configuration</h2>
-                <div class="config-section">
-                    <h3>Setup Instructions</h3>
-                    <div class="config-instructions">
-                        <p><strong>First time setup:</strong></p>
-                        <p>1. Go to <a href="https://jsonbin.io" target="_blank">JSONBin.io</a> and create a free account</p>
-                        <p>2. Create a new bin with initial data (see README)</p>
-                        <p>3. Copy your <strong>Master Key</strong> and <strong>Bin ID</strong></p>
-                        <p>4. Enter them below and click <strong>Save</strong></p>
-                        <p>5. Your credentials will be saved in your browser - you only need to do this once per device!</p>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label for="api-key">JSONBin.io Master Key</label>
-                    <input type="password" id="api-key" placeholder="$2a$10...">
-                </div>
-                <div class="input-group">
-                    <label for="bin-id">Bin ID</label>
-                    <input type="text" id="bin-id" placeholder="66f1234567890abcd">
-                </div>
-                <button class="btn btn-primary" id="save-config-btn">💾 Save Configuration</button>
-                <button class="btn btn-accent btn-small" id="test-connection-btn" style="margin-left: 10px;">🔌 Test Connection</button>
-                <div id="config-status" style="margin-top: 16px; padding: 12px; border-radius: 8px; display: none;"></div>
-            </div>
-        </div>
     </div>
 
     <script>
         // ============================================
-        // CONFIGURATION
+        // CONFIGURATION - PUT YOUR CREDENTIALS HERE
         // ============================================
-        // Leave these as-is - credentials are stored in browser localStorage
-        let JSONBIN_API_KEY = '';
-        let JSONBIN_BIN_ID = '';
+        const JSONBIN_API_KEY = '$2a$10$721mBXbhDM.r421Nxp27M.wEacWpLYhbQI0uA4ctGTpCx5nxi/sB.';  // Replace with your actual Master Key
+        const JSONBIN_BIN_ID = '69910c0d43b1c97be97f9cd9';                // Replace with your actual Bin ID
         // ============================================
 
         // App State
@@ -638,7 +607,6 @@
 
         // Initialize app
         function init() {
-            loadConfig();
             // Always try to load from JSONBin first to sync latest data
             loadFromJSONBin().then(() => {
                 // After loading remote data, render everything
@@ -648,29 +616,6 @@
                 renderHistory();
             });
             setupEventListeners();
-        }
-
-        // Configuration management with localStorage
-        function saveConfig() {
-            localStorage.setItem('groceryAppConfig', JSON.stringify({
-                apiKey: JSONBIN_API_KEY,
-                binId: JSONBIN_BIN_ID
-            }));
-        }
-
-        function loadConfig() {
-            const saved = localStorage.getItem('groceryAppConfig');
-            if (saved) {
-                const config = JSON.parse(saved);
-                JSONBIN_API_KEY = config.apiKey || '';
-                JSONBIN_BIN_ID = config.binId || '';
-                
-                // Populate settings fields if they exist
-                const apiKeyInput = document.getElementById('api-key');
-                const binIdInput = document.getElementById('bin-id');
-                if (apiKeyInput) apiKeyInput.value = JSONBIN_API_KEY;
-                if (binIdInput) binIdInput.value = JSONBIN_BIN_ID;
-            }
         }
 
         // JSONBin.io Functions
@@ -735,10 +680,17 @@
 
                 const data = await response.json();
                 
+                console.log('Raw data from JSONBin:', data);
+                
                 if (data.record) {
+                    console.log('Before update - stores:', appData.stores.length, 'lists:', Object.keys(appData.lists).length);
+                    
                     appData.stores = data.record.stores || appData.stores;
                     appData.lists = data.record.lists || appData.lists;
                     appData.history = data.record.history || appData.history;
+                    
+                    console.log('After update - stores:', appData.stores.length, 'lists:', Object.keys(appData.lists).length);
+                    console.log('Lists data:', JSON.stringify(appData.lists));
                     
                     // Update UI if it's already rendered
                     renderStoreSelector();
@@ -774,23 +726,8 @@
         }
 
         function showConfigStatus(message, type) {
-            const statusDiv = document.getElementById('config-status');
-            if (!statusDiv) return;
-            
-            statusDiv.style.display = 'block';
-            statusDiv.textContent = message;
-            statusDiv.style.background = type === 'success' ? 'rgba(82, 183, 136, 0.2)' : 
-                                        type === 'error' ? 'rgba(230, 57, 70, 0.2)' : 
-                                        'rgba(244, 162, 97, 0.2)';
-            statusDiv.style.color = type === 'success' ? 'var(--success)' : 
-                                   type === 'error' ? 'var(--danger)' : 
-                                   'var(--accent)';
-            
-            if (type === 'success') {
-                setTimeout(() => {
-                    statusDiv.style.display = 'none';
-                }, 3000);
-            }
+            // This function is no longer needed but kept for compatibility
+            console.log(`Config status (${type}): ${message}`);
         }
 
         // Toast notification system
@@ -823,15 +760,22 @@
 
             document.getElementById('add-item-btn').addEventListener('click', addItem);
             document.getElementById('add-store-btn').addEventListener('click', addStore);
-            document.getElementById('save-config-btn').addEventListener('click', saveConfiguration);
-            document.getElementById('test-connection-btn').addEventListener('click', testConnection);
             
             // Manual sync button
-            document.getElementById('manual-sync-btn').addEventListener('click', () => {
+            document.getElementById('manual-sync-btn').addEventListener('click', async () => {
                 showToast('Syncing...', 'success');
-                loadFromJSONBin().then(() => {
+                try {
+                    await loadFromJSONBin();
+                    // Force re-render everything
+                    renderStoreSelector();
+                    renderLists();
+                    renderStoreManager();
+                    renderHistory();
                     showToast('✓ Synced!', 'success');
-                });
+                } catch (error) {
+                    showToast('Sync failed', 'error');
+                    console.error('Manual sync error:', error);
+                }
             });
             
             document.getElementById('item-name').addEventListener('keypress', (e) => {
@@ -1138,55 +1082,6 @@
 
                 container.appendChild(historyItem);
             });
-        }
-
-        // Configuration
-        function saveConfiguration() {
-            const apiKey = document.getElementById('api-key').value.trim();
-            const binId = document.getElementById('bin-id').value.trim();
-
-            if (!apiKey || !binId) {
-                showConfigStatus('Please enter both API Key and Bin ID', 'error');
-                return;
-            }
-
-            JSONBIN_API_KEY = apiKey;
-            JSONBIN_BIN_ID = binId;
-            saveConfig();
-            
-            showConfigStatus('✓ Configuration saved! Your credentials are stored in your browser.', 'success');
-            
-            // Try to load data immediately
-            loadFromJSONBin();
-        }
-
-        async function testConnection() {
-            const apiKey = document.getElementById('api-key').value.trim();
-            const binId = document.getElementById('bin-id').value.trim();
-
-            if (!apiKey || !binId) {
-                showConfigStatus('Please enter both API Key and Bin ID', 'error');
-                return;
-            }
-
-            showConfigStatus('Testing connection...', 'info');
-
-            try {
-                const response = await fetch(`${JSONBIN_BASE_URL}/b/${binId}/latest`, {
-                    method: 'GET',
-                    headers: {
-                        'X-Master-Key': apiKey
-                    }
-                });
-
-                if (response.ok) {
-                    showConfigStatus('✓ Connection successful! Your configuration is working.', 'success');
-                } else {
-                    showConfigStatus('✗ Connection failed. Please check your API Key and Bin ID.', 'error');
-                }
-            } catch (error) {
-                showConfigStatus('✗ Connection error: ' + error.message, 'error');
-            }
         }
 
         // Start the app
