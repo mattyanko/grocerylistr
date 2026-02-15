@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grocery Lists</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Grocery Lists">
+    <meta name="theme-color" content="#2D5F3F">
+    <meta name="description" content="Shared grocery list app for easy shopping">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkdyb2NlcnkgTGlzdHMiLAogICJzaG9ydF9uYW1lIjogIkdyb2NlcnkiLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJzdGFydF91cmwiOiAiLiIsCiAgInRoZW1lX2NvbG9yIjogIiMyRDVGM0YiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNGQUZBRjgiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnJTIweG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyUyMHZpZXdCb3g9JzAlMjAwJTIwMTAwJTIwMTAwJyUzRSUzQ3JlY3QlMjBmaWxsPSclMjMyRDVGM0YnJTIwd2lkdGg9JzEwMCclMjBoZWlnaHQ9JzEwMCUnLyUzRSUzQ3RleHQlMjB4PSc1MCUyNSclMjB5PSc1MCUyNSclMjBmb250LXNpemU9JzYwJyUyMHRleHQtYW5jaG9yPSdtaWRkbGUnJTIwZHk9Jy4zZW0nJTNFJUYwJTlGJTlCJTkyJTNDL3RleHQlM0UlM0Mvc3ZnJTNFIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfSwKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnJTIweG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyUyMHZpZXdCb3g9JzAlMjAwJTIwMTAwJTIwMTAwJyUzRSUzQ3JlY3QlMjBmaWxsPSclMjMyRDVGM0YnJTIwd2lkdGg9JzEwMCclMjBoZWlnaHQ9JzEwMCclLyUzRSUzQ3RleHQlMjB4PSc1MCUyNSclMjB5PSc1MCUyNSclMjBmb250LXNpemU9JzYwJyUyMHRleHQtYW5jaG9yPSdtaWRkbGUnJTIwZHk9Jy4zZW0nJTNFJUYwJTlGJTlCJTkyJTNDL3RleHQlM0UlM0Mvc3ZnJTNFIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0KfQ==">
+    
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -505,6 +517,9 @@
         <header>
             <h1>🛒 Grocery Lists</h1>
             <p class="subtitle">Shared shopping made simple</p>
+            <button id="manual-sync-btn" class="btn btn-accent btn-small" style="margin-top: 12px; font-size: 0.85rem;">
+                🔄 Sync Now
+            </button>
         </header>
 
         <div class="tabs">
@@ -700,11 +715,16 @@
             }
 
             try {
-                const response = await fetch(`${JSONBIN_BASE_URL}/b/${JSONBIN_BIN_ID}/latest`, {
+                // Add timestamp to prevent iOS from caching
+                const timestamp = new Date().getTime();
+                const response = await fetch(`${JSONBIN_BASE_URL}/b/${JSONBIN_BIN_ID}/latest?_t=${timestamp}`, {
                     method: 'GET',
                     headers: {
                         'X-Master-Key': JSONBIN_API_KEY,
-                        'X-Bin-Meta': 'false'
+                        'X-Bin-Meta': 'false',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
                     },
                     cache: 'no-store' // Force fresh data, don't use cached version
                 });
@@ -726,7 +746,7 @@
                     renderStoreManager();
                     renderHistory();
                     
-                    console.log('✓ Data loaded from JSONBin');
+                    console.log('✓ Data loaded from JSONBin at', new Date().toLocaleTimeString());
                 }
             } catch (error) {
                 console.error('Error loading from JSONBin:', error);
@@ -805,6 +825,14 @@
             document.getElementById('add-store-btn').addEventListener('click', addStore);
             document.getElementById('save-config-btn').addEventListener('click', saveConfiguration);
             document.getElementById('test-connection-btn').addEventListener('click', testConnection);
+            
+            // Manual sync button
+            document.getElementById('manual-sync-btn').addEventListener('click', () => {
+                showToast('Syncing...', 'success');
+                loadFromJSONBin().then(() => {
+                    showToast('✓ Synced!', 'success');
+                });
+            });
             
             document.getElementById('item-name').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') addItem();
@@ -1171,22 +1199,52 @@
             }
         }, 30000);
 
-        // iOS Fix: Reload data when app becomes visible
-        // This handles the case where iOS might have cleared localStorage
+        // iOS Fix: Reload data when app becomes visible (more aggressive)
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && JSONBIN_API_KEY && JSONBIN_BIN_ID) {
                 console.log('App visible, reloading data...');
-                loadFromJSONBin();
+                // Use setTimeout to ensure iOS has fully restored the page
+                setTimeout(() => {
+                    loadFromJSONBin();
+                }, 100);
             }
         });
 
         // iOS Fix: Also reload on page show (handles back/forward navigation)
         window.addEventListener('pageshow', (event) => {
-            if (event.persisted && JSONBIN_API_KEY && JSONBIN_BIN_ID) {
-                console.log('Page restored from cache, reloading data...');
+            if (JSONBIN_API_KEY && JSONBIN_BIN_ID) {
+                console.log('Page shown, reloading data...');
                 loadFromJSONBin();
             }
         });
+
+        // iOS Fix: Reload on focus
+        window.addEventListener('focus', () => {
+            if (JSONBIN_API_KEY && JSONBIN_BIN_ID) {
+                console.log('Window focused, reloading data...');
+                loadFromJSONBin();
+            }
+        });
+
+        // Add pull-to-refresh for mobile
+        let touchStartY = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const touchDiff = touchY - touchStartY;
+            
+            // If user pulls down at the top of the page, refresh
+            if (touchDiff > 80 && window.scrollY === 0) {
+                if (JSONBIN_API_KEY && JSONBIN_BIN_ID) {
+                    console.log('Pull to refresh triggered');
+                    showToast('Refreshing...', 'success');
+                    loadFromJSONBin();
+                }
+            }
+        }, { passive: true });
     </script>
 </body>
 </html>
