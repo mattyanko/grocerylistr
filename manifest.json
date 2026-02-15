@@ -1,24 +1,20 @@
 {
-  "name": "Grocery Lists",
-  "short_name": "Grocery",
-  "description": "Shared grocery list app for easy shopping",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#FAFAF8",
-  "theme_color": "#2D5F3F",
-  "orientation": "portrait",
+  "short_name": "MySite",
+  "name": "My GitHub Page Name",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%232D5F3F' width='100%25' height='100%25'/%3E%3Ctext x='50%25' y='50%25' font-size='60' text-anchor='middle' dy='.3em'%3E🛒%3C/text%3E%3C/svg%3E",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%232D5F3F' width='100%25' height='100%25'/%3E%3Ctext x='50%25' y='50%25' font-size='60' text-anchor='middle' dy='.3em'%3E🛒%3C/text%3E%3C/svg%3E",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "theme_color": "#000000"
 }
