@@ -520,7 +520,15 @@
             <button id="manual-sync-btn" class="btn btn-accent btn-small" style="margin-top: 12px; font-size: 0.85rem;">
                 🔄 Sync Now
             </button>
+            <button id="toggle-debug-btn" class="btn btn-small" style="margin-top: 12px; font-size: 0.85rem; background: #6B6B6B; color: white;">
+                🐛 Debug
+            </button>
         </header>
+
+        <div id="debug-panel" style="display: none; background: #1a1a1a; color: #00ff00; padding: 20px; margin: 20px; border-radius: 12px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto;">
+            <div style="margin-bottom: 10px; color: white; font-weight: bold;">DEBUG INFO:</div>
+            <div id="debug-content"></div>
+        </div>
 
         <div class="tabs">
             <button class="tab active" data-tab="add">Add Item</button>
@@ -587,8 +595,8 @@
         // ============================================
         // CONFIGURATION - PUT YOUR CREDENTIALS HERE
         // ============================================
-        const JSONBIN_API_KEY = '$2a$10$721mBXbhDM.r421Nxp27M.wEacWpLYhbQI0uA4ctGTpCx5nxi/sB.';  // Replace with your actual Master Key
-        const JSONBIN_BIN_ID = '69910c0d43b1c97be97f9cd9';                // Replace with your actual Bin ID
+        const JSONBIN_API_KEY = 'YOUR_JSONBIN_MASTER_KEY_HERE';  // Replace with your actual Master Key
+        const JSONBIN_BIN_ID = 'YOUR_BIN_ID_HERE';                // Replace with your actual Bin ID
         // ============================================
 
         // App State
@@ -654,15 +662,24 @@
         }
 
         async function loadFromJSONBin() {
+            debugLog('loadFromJSONBin called');
+            
             if (!JSONBIN_API_KEY || !JSONBIN_BIN_ID) {
+                debugLog('ERROR: No JSONBin config!');
                 console.log('No JSONBin config, using default data');
                 return;
             }
 
+            debugLog('API Key: ' + JSONBIN_API_KEY.substring(0, 10) + '...');
+            debugLog('Bin ID: ' + JSONBIN_BIN_ID);
+
             try {
                 // Add timestamp to prevent iOS from caching
                 const timestamp = new Date().getTime();
-                const response = await fetch(`${JSONBIN_BASE_URL}/b/${JSONBIN_BIN_ID}/latest?_t=${timestamp}`, {
+                const url = `${JSONBIN_BASE_URL}/b/${JSONBIN_BIN_ID}/latest?_t=${timestamp}`;
+                debugLog('Fetching: ' + url);
+                
+                const response = await fetch(url, {
                     method: 'GET',
                     headers: {
                         'X-Master-Key': JSONBIN_API_KEY,
@@ -674,33 +691,44 @@
                     cache: 'no-store' // Force fresh data, don't use cached version
                 });
 
+                debugLog('Response status: ' + response.status);
+
                 if (!response.ok) {
+                    debugLog('ERROR: Response not OK');
                     throw new Error('Failed to load from JSONBin');
                 }
 
                 const data = await response.json();
+                debugLog('Data received: ' + JSON.stringify(data).substring(0, 200) + '...');
                 
                 console.log('Raw data from JSONBin:', data);
                 
                 if (data.record) {
+                    debugLog('Processing data.record...');
                     console.log('Before update - stores:', appData.stores.length, 'lists:', Object.keys(appData.lists).length);
                     
                     appData.stores = data.record.stores || appData.stores;
                     appData.lists = data.record.lists || appData.lists;
                     appData.history = data.record.history || appData.history;
                     
+                    debugLog('After update - Stores: ' + appData.stores.length);
+                    debugLog('After update - Lists keys: ' + Object.keys(appData.lists).length);
+                    
                     console.log('After update - stores:', appData.stores.length, 'lists:', Object.keys(appData.lists).length);
                     console.log('Lists data:', JSON.stringify(appData.lists));
                     
                     // Update UI if it's already rendered
+                    debugLog('Rendering UI...');
                     renderStoreSelector();
                     renderLists();
                     renderStoreManager();
                     renderHistory();
                     
+                    debugLog('✓ Data loaded successfully at ' + new Date().toLocaleTimeString());
                     console.log('✓ Data loaded from JSONBin at', new Date().toLocaleTimeString());
                 }
             } catch (error) {
+                debugLog('ERROR: ' + error.message);
                 console.error('Error loading from JSONBin:', error);
                 // If this is the first load and it fails, show a toast
                 if (appData.lists && Object.keys(appData.lists).length === 0) {
@@ -749,6 +777,28 @@
             }, 2500);
         }
 
+        // Debug system
+        function debugLog(message) {
+            const debugContent = document.getElementById('debug-content');
+            if (debugContent) {
+                const time = new Date().toLocaleTimeString();
+                debugContent.innerHTML += `<div>[${time}] ${message}</div>`;
+                debugContent.scrollTop = debugContent.scrollHeight;
+            }
+            console.log(message);
+        }
+
+        function showDebugInfo() {
+            debugLog('=== DEBUG INFO ===');
+            debugLog(`API Key set: ${JSONBIN_API_KEY ? 'YES (length: ' + JSONBIN_API_KEY.length + ')' : 'NO'}`);
+            debugLog(`Bin ID set: ${JSONBIN_BIN_ID ? 'YES (' + JSONBIN_BIN_ID + ')' : 'NO'}`);
+            debugLog(`Stores: ${JSON.stringify(appData.stores)}`);
+            debugLog(`Lists: ${JSON.stringify(appData.lists)}`);
+            debugLog(`Total items across all lists: ${Object.values(appData.lists).reduce((sum, list) => sum + list.length, 0)}`);
+            debugLog(`History count: ${appData.history.length}`);
+            debugLog(`User Agent: ${navigator.userAgent}`);
+        }
+
         // Tab Navigation
         function setupEventListeners() {
             document.querySelectorAll('.tab').forEach(tab => {
@@ -764,6 +814,7 @@
             // Manual sync button
             document.getElementById('manual-sync-btn').addEventListener('click', async () => {
                 showToast('Syncing...', 'success');
+                debugLog('Manual sync triggered');
                 try {
                     await loadFromJSONBin();
                     // Force re-render everything
@@ -772,9 +823,22 @@
                     renderStoreManager();
                     renderHistory();
                     showToast('✓ Synced!', 'success');
+                    showDebugInfo();
                 } catch (error) {
                     showToast('Sync failed', 'error');
+                    debugLog('Manual sync error: ' + error);
                     console.error('Manual sync error:', error);
+                }
+            });
+
+            // Debug toggle button
+            document.getElementById('toggle-debug-btn').addEventListener('click', () => {
+                const debugPanel = document.getElementById('debug-panel');
+                if (debugPanel.style.display === 'none') {
+                    debugPanel.style.display = 'block';
+                    showDebugInfo();
+                } else {
+                    debugPanel.style.display = 'none';
                 }
             });
             
