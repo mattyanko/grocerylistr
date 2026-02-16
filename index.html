@@ -575,6 +575,53 @@
             gap: 8px;
         }
 
+        /* Autocomplete dropdown */
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 2px solid var(--primary-light);
+            border-radius: 10px;
+            margin-top: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 4px 12px var(--shadow);
+            display: none;
+        }
+
+        .autocomplete-dropdown.visible {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.2s ease;
+        }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: var(--bg-main);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .autocomplete-item:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .autocomplete-item:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .input-with-autocomplete {
+            position: relative;
+        }
+
         /* Delete choice modal */
         .delete-modal-overlay {
             display: none;
@@ -837,7 +884,10 @@
                 <h2 class="card-title">Add New Item</h2>
                 <div class="input-group">
                     <label for="item-name">Item Name</label>
-                    <input type="text" id="item-name" placeholder="e.g., Green Tea">
+                    <div class="input-with-autocomplete">
+                        <input type="text" id="item-name" placeholder="e.g., Green Tea" autocomplete="off">
+                        <div class="autocomplete-dropdown" id="item-name-autocomplete"></div>
+                    </div>
                 </div>
                 <div class="input-group">
                     <label>Select Stores</label>
@@ -1238,6 +1288,99 @@
             debugLog(`User Agent: ${navigator.userAgent}`);
         }
 
+        // Autocomplete functionality
+        function setupAutocomplete(inputId, dropdownId) {
+            const input = document.getElementById(inputId);
+            const dropdown = document.getElementById(dropdownId);
+            let selectedIndex = -1;
+
+            input.addEventListener('input', (e) => {
+                const value = e.target.value.trim().toLowerCase();
+                
+                if (value.length === 0) {
+                    dropdown.classList.remove('visible');
+                    return;
+                }
+
+                // Filter history items that match
+                const matches = appData.history.filter(item => 
+                    item.toLowerCase().includes(value)
+                ).sort((a, b) => {
+                    // Prioritize items that start with the search term
+                    const aStarts = a.toLowerCase().startsWith(value);
+                    const bStarts = b.toLowerCase().startsWith(value);
+                    if (aStarts && !bStarts) return -1;
+                    if (!aStarts && bStarts) return 1;
+                    return a.toLowerCase().localeCompare(b.toLowerCase());
+                });
+
+                if (matches.length === 0) {
+                    dropdown.classList.remove('visible');
+                    return;
+                }
+
+                // Show dropdown with matches
+                dropdown.innerHTML = matches.slice(0, 8).map((item, index) => 
+                    `<div class="autocomplete-item" data-value="${item}" data-index="${index}">${item}</div>`
+                ).join('');
+                dropdown.classList.add('visible');
+                selectedIndex = -1;
+            });
+
+            // Handle keyboard navigation
+            input.addEventListener('keydown', (e) => {
+                const items = dropdown.querySelectorAll('.autocomplete-item');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+                    updateSelection(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, -1);
+                    updateSelection(items);
+                } else if (e.key === 'Enter' && selectedIndex >= 0) {
+                    e.preventDefault();
+                    const selectedItem = items[selectedIndex];
+                    if (selectedItem) {
+                        input.value = selectedItem.dataset.value;
+                        dropdown.classList.remove('visible');
+                        selectedIndex = -1;
+                    }
+                } else if (e.key === 'Escape') {
+                    dropdown.classList.remove('visible');
+                    selectedIndex = -1;
+                }
+            });
+
+            function updateSelection(items) {
+                items.forEach((item, index) => {
+                    item.classList.toggle('selected', index === selectedIndex);
+                    if (index === selectedIndex) {
+                        item.scrollIntoView({ block: 'nearest' });
+                    }
+                });
+            }
+
+            // Handle click on autocomplete item
+            dropdown.addEventListener('click', (e) => {
+                const item = e.target.closest('.autocomplete-item');
+                if (item) {
+                    input.value = item.dataset.value;
+                    dropdown.classList.remove('visible');
+                    selectedIndex = -1;
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('visible');
+                    selectedIndex = -1;
+                }
+            });
+        }
+
         // Tab Navigation
         function setupEventListeners() {
             document.querySelectorAll('.tab').forEach(tab => {
@@ -1307,6 +1450,9 @@
             document.getElementById('item-name').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') addItem();
             });
+
+            // Autocomplete for main item input
+            setupAutocomplete('item-name', 'item-name-autocomplete');
             
             document.getElementById('new-store-name').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') addStore();
@@ -1517,7 +1663,10 @@
                         </div>
                     </div>
                     <div class="quick-add-inline">
-                        <input type="text" placeholder="Quick add item..." class="quick-add-input" data-store="${store}">
+                        <div class="input-with-autocomplete" style="flex: 1;">
+                            <input type="text" placeholder="Quick add item..." class="quick-add-input" data-store="${store}" autocomplete="off" id="quick-add-${store.replace(/\s+/g, '-')}">
+                            <div class="autocomplete-dropdown" id="quick-add-${store.replace(/\s+/g, '-')}-autocomplete"></div>
+                        </div>
                         <button class="btn btn-accent btn-small quick-add-btn" data-store="${store}">Add</button>
                     </div>
                     <div class="grocery-items" id="list-${store.replace(/\s+/g, '-')}">
@@ -1590,6 +1739,11 @@
                 // Quick add functionality
                 const quickAddBtn = listCard.querySelector('.quick-add-btn');
                 const quickAddInput = listCard.querySelector('.quick-add-input');
+                
+                // Setup autocomplete for this quick-add input
+                const inputId = `quick-add-${store.replace(/\s+/g, '-')}`;
+                const autocompleteId = `${inputId}-autocomplete`;
+                setupAutocomplete(inputId, autocompleteId);
                 
                 quickAddBtn.addEventListener('click', () => {
                     const itemName = quickAddInput.value.trim();
