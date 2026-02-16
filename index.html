@@ -14,7 +14,11 @@
     <meta name="description" content="Shared grocery list app for easy shopping">
     
     <!-- Manifest -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkdyb2NlcnkgTGlzdHMiLAogICJzaG9ydF9uYW1lIjogIkdyb2NlcnkiLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJzdGFydF91cmwiOiAiLiIsCiAgInRoZW1lX2NvbG9yIjogIiMyRDVGM0YiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNGQUZBRjgiLAogICJpY29ucyI6IFsKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnJTIweG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyUyMHZpZXdCb3g9JzAlMjAwJTIwMTAwJTIwMTAwJyUzRSUzQ3JlY3QlMjBmaWxsPSclMjMyRDVGM0YnJTIwd2lkdGg9JzEwMCclMjBoZWlnaHQ9JzEwMCUnLyUzRSUzQ3RleHQlMjB4PSc1MCUyNSclMjB5PSc1MCUyNSclMjBmb250LXNpemU9JzYwJyUyMHRleHQtYW5jaG9yPSdtaWRkbGUnJTIwZHk9Jy4zZW0nJTNFJUYwJTlGJTlCJTkyJTNDL3RleHQlM0UlM0Mvc3ZnJTNFIiwKICAgICAgInNpemVzIjogIjE5MngxOTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfSwKICAgIHsKICAgICAgInNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWwsJTNDc3ZnJTIweG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyUyMHZpZXdCb3g9JzAlMjAwJTIwMTAwJTIwMTAwJyUzRSUzQ3JlY3QlMjBmaWxsPSclMjMyRDVGM0YnJTIwd2lkdGg9JzEwMCclMjBoZWlnaHQ9JzEwMCclLyUzRSUzQ3RleHQlMjB4PSc1MCUyNSclMjB5PSc1MCUyNSclMjBmb250LXNpemU9JzYwJyUyMHRleHQtYW5jaG9yPSdtaWRkbGUnJTIwZHk9Jy4zZW0nJTNFJUYwJTlGJTlCJTkyJTNDL3RleHQlM0UlM0Mvc3ZnJTNFIiwKICAgICAgInNpemVzIjogIjUxMng1MTIiLAogICAgICAidHlwZSI6ICJpbWFnZS9zdmcreG1sIgogICAgfQogIF0KfQ==">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon / Icon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%232D5F3F' width='100%25' height='100%25'/%3E%3Ctext x='50%25' y='50%25' font-size='60' text-anchor='middle' dy='.3em'%3E🛒%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%232D5F3F' width='100%25' height='100%25'/%3E%3Ctext x='50%25' y='50%25' font-size='60' text-anchor='middle' dy='.3em'%3E🛒%3C/text%3E%3C/svg%3E">
     
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -355,21 +359,292 @@
             background: var(--bg-main);
             border-radius: 10px;
             margin-bottom: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .history-item-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
             cursor: pointer;
-        }
-
-        .history-item:hover {
-            border-color: var(--primary-light);
-            transform: translateX(4px);
         }
 
         .history-item-name {
             font-weight: 500;
+            flex: 1;
+        }
+
+        .history-item-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .history-expand-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            transition: transform 0.3s ease;
+            color: var(--primary);
+        }
+
+        .history-expand-btn.expanded {
+            transform: rotate(180deg);
+        }
+
+        .history-item-stores {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .history-item-stores.visible {
+            display: block;
+        }
+
+        .history-store-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .history-store-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .history-store-checkbox input {
+            cursor: pointer;
+        }
+
+        .history-store-checkbox label {
+            cursor: pointer;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .bulk-select-bar {
+            background: var(--primary);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px var(--shadow);
+            color: white;
+        }
+
+        .bulk-select-bar.active {
+            display: flex;
+        }
+
+        .bulk-select-bar .btn {
+            background: white;
+            color: var(--primary);
+        }
+
+        .bulk-select-bar .btn:hover {
+            background: var(--bg-main);
+        }
+
+        .bulk-select-info {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .history-item-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-right: 12px;
+            display: none;
+        }
+
+        .bulk-mode .history-item-checkbox {
+            display: block;
+        }
+
+        .bulk-mode .history-item {
+            cursor: pointer;
+        }
+
+        .bulk-mode .history-item:hover {
+            border-color: var(--primary-light);
+            transform: translateX(4px);
+        }
+
+        .bulk-mode .history-expand-btn {
+            display: none;
+        }
+
+        .bulk-store-selector {
+            display: none;
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            border: 2px solid var(--primary);
+        }
+
+        .bulk-store-selector.visible {
+            display: block;
+        }
+
+        .bulk-store-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--primary-dark);
+        }
+
+        .history-dropdown-container {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .history-dropdown-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            text-align: left;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-dropdown-btn:hover {
+            border-color: var(--primary-light);
+        }
+
+        .history-dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .history-dropdown-content.visible {
+            display: block;
+        }
+
+        .history-dropdown-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-dropdown-item:hover {
+            background: var(--bg-main);
+        }
+
+        .history-dropdown-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .history-dropdown-footer {
+            padding: 10px 12px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Delete choice modal */
+        .delete-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-modal-overlay.visible {
+            display: flex;
+        }
+
+        .delete-modal {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .delete-modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--primary-dark);
+        }
+
+        .delete-modal-item {
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .delete-modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .delete-modal-buttons button {
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 640px) {
+            .delete-modal {
+                width: 85%;
+            }
         }
 
         .quick-add-inline {
@@ -517,13 +792,31 @@
         <header>
             <h1>🛒 Grocery Lists</h1>
             <p class="subtitle">Shared shopping made simple</p>
-            <button id="manual-sync-btn" class="btn btn-accent btn-small" style="margin-top: 12px; font-size: 0.85rem;">
-                🔄 Sync Now
-            </button>
-            <button id="toggle-debug-btn" class="btn btn-small" style="margin-top: 12px; font-size: 0.85rem; background: #6B6B6B; color: white;">
-                🐛 Debug
-            </button>
+            <div id="debug-buttons" style="display: none; gap: 8px; justify-content: center; margin-top: 12px;">
+                <button id="manual-sync-btn" class="btn btn-accent btn-small" style="font-size: 0.85rem;">
+                    🔄 Sync Now
+                </button>
+                <button id="force-reload-btn" class="btn btn-small" style="font-size: 0.85rem; background: var(--danger); color: white;">
+                    ⚡ Force Reload
+                </button>
+                <button id="toggle-debug-btn" class="btn btn-small" style="font-size: 0.85rem; background: #6B6B6B; color: white;">
+                    🐛 Debug
+                </button>
+            </div>
         </header>
+
+        <!-- Delete Choice Modal -->
+        <div class="delete-modal-overlay" id="delete-modal-overlay">
+            <div class="delete-modal">
+                <div class="delete-modal-title">Delete Item</div>
+                <div class="delete-modal-item" id="delete-modal-item"></div>
+                <div class="delete-modal-buttons">
+                    <button class="btn btn-danger" id="delete-all-stores">Delete from All Stores</button>
+                    <button class="btn btn-small" id="delete-this-store" style="background: var(--accent); color: white;">Delete from <span id="delete-store-name"></span> Only</button>
+                    <button class="btn btn-small" id="delete-cancel" style="background: var(--text-secondary); color: white;">Cancel</button>
+                </div>
+            </div>
+        </div>
 
         <div id="debug-panel" style="display: none; background: #1a1a1a; color: #00ff00; padding: 20px; margin: 20px; border-radius: 12px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto;">
             <div style="margin-bottom: 10px; color: white; font-weight: bold;">DEBUG INFO:</div>
@@ -584,7 +877,28 @@
         <!-- History Tab -->
         <div class="tab-content" id="history-tab">
             <div class="card">
-                <h2 class="card-title">All Items Ever Added</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="card-title" style="margin-bottom: 0;">All Items Ever Added</h2>
+                    <button class="btn btn-accent btn-small" id="bulk-select-toggle">Select Multiple</button>
+                </div>
+                
+                <div class="bulk-select-bar" id="bulk-select-bar">
+                    <span class="bulk-select-info"><span id="bulk-count">0</span> items selected</span>
+                    <button class="btn btn-small" id="bulk-add-btn">Add to Stores</button>
+                    <button class="btn btn-small" id="bulk-cancel-btn">Cancel</button>
+                </div>
+
+                <div class="bulk-store-selector" id="bulk-store-selector">
+                    <div class="bulk-store-title">Select stores to add items to:</div>
+                    <div class="history-store-grid" id="bulk-store-grid">
+                        <!-- Will be populated -->
+                    </div>
+                    <div style="margin-top: 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-primary" id="bulk-confirm-add">Add Selected Items</button>
+                        <button class="btn btn-small" id="bulk-store-cancel" style="background: var(--text-secondary); color: white;">Cancel</button>
+                    </div>
+                </div>
+                
                 <div id="history-list">
                     <!-- History items will be populated here -->
                 </div>
@@ -595,6 +909,20 @@
         <div class="tab-content" id="settings-tab">
             <div class="card">
                 <h2 class="card-title">⚙️ Configuration</h2>
+                
+                <div class="config-section">
+                    <h3>Developer Options</h3>
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-main); border-radius: 8px; margin-bottom: 20px;">
+                        <label style="flex: 1; margin: 0; cursor: pointer;" for="debug-mode-toggle">
+                            <strong>Show Debug Buttons</strong>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 4px 0 0 0;">
+                                Display Sync Now, Force Reload, and Debug buttons in header
+                            </p>
+                        </label>
+                        <input type="checkbox" id="debug-mode-toggle" style="width: 24px; height: 24px; cursor: pointer;">
+                    </div>
+                </div>
+                
                 <div class="config-section">
                     <h3>JSONBin.io Setup</h3>
                     <div class="config-instructions">
@@ -668,7 +996,8 @@
         function saveConfig() {
             localStorage.setItem('groceryAppConfig', JSON.stringify({
                 apiKey: JSONBIN_API_KEY,
-                binId: JSONBIN_BIN_ID
+                binId: JSONBIN_BIN_ID,
+                debugMode: document.getElementById('debug-mode-toggle')?.checked || false
             }));
             debugLog('Config saved to localStorage');
         }
@@ -685,12 +1014,21 @@
                     debugLog('API Key loaded: ' + (JSONBIN_API_KEY ? 'YES' : 'NO'));
                     debugLog('Bin ID loaded: ' + (JSONBIN_BIN_ID ? 'YES' : 'NO'));
                     
+                    // Apply debug mode setting
+                    const debugMode = config.debugMode || false;
+                    const debugButtons = document.getElementById('debug-buttons');
+                    if (debugButtons) {
+                        debugButtons.style.display = debugMode ? 'flex' : 'none';
+                    }
+                    
                     // Populate settings fields if they exist
                     setTimeout(() => {
                         const apiKeyInput = document.getElementById('api-key');
                         const binIdInput = document.getElementById('bin-id');
+                        const debugToggle = document.getElementById('debug-mode-toggle');
                         if (apiKeyInput) apiKeyInput.value = JSONBIN_API_KEY;
                         if (binIdInput) binIdInput.value = JSONBIN_BIN_ID;
+                        if (debugToggle) debugToggle.checked = debugMode;
                     }, 0);
                 } catch (error) {
                     debugLog('Error loading config: ' + error.message);
@@ -748,9 +1086,10 @@
             debugLog('Bin ID: ' + JSONBIN_BIN_ID);
 
             try {
-                // Add timestamp to prevent iOS from caching
+                // Add timestamp AND random to prevent ANY caching
                 const timestamp = new Date().getTime();
-                const url = `${JSONBIN_BASE_URL}/b/${JSONBIN_BIN_ID}/latest?_t=${timestamp}`;
+                const random = Math.random().toString(36).substring(7);
+                const url = `${JSONBIN_BASE_URL}/b/${JSONBIN_BIN_ID}/latest?_t=${timestamp}&_r=${random}`;
                 debugLog('Fetching: ' + url);
                 
                 const response = await fetch(url, {
@@ -758,11 +1097,12 @@
                     headers: {
                         'X-Master-Key': JSONBIN_API_KEY,
                         'X-Bin-Meta': 'false',
-                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
                         'Pragma': 'no-cache',
                         'Expires': '0'
                     },
-                    cache: 'no-store' // Force fresh data, don't use cached version
+                    cache: 'no-store', // Force fresh data, don't use cached version
+                    mode: 'cors'
                 });
 
                 debugLog('Response status: ' + response.status);
@@ -932,6 +1272,27 @@
                 }
             });
 
+            // Force reload button - clears everything and reloads
+            document.getElementById('force-reload-btn').addEventListener('click', () => {
+                if (confirm('This will clear app cache and reload fresh data. Continue?')) {
+                    debugLog('Force reload triggered');
+                    // Clear the in-memory data
+                    appData.stores = [];
+                    appData.lists = {};
+                    appData.history = [];
+                    // Reload from JSONBin
+                    showToast('Force reloading...', 'success');
+                    loadFromJSONBin().then(() => {
+                        renderStoreSelector();
+                        renderLists();
+                        renderStoreManager();
+                        renderHistory();
+                        showToast('✓ Reloaded fresh data!', 'success');
+                        showDebugInfo();
+                    });
+                }
+            });
+
             // Debug toggle button
             document.getElementById('toggle-debug-btn').addEventListener('click', () => {
                 const debugPanel = document.getElementById('debug-panel');
@@ -949,6 +1310,76 @@
             
             document.getElementById('new-store-name').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') addStore();
+            });
+
+            // Debug mode toggle
+            document.getElementById('debug-mode-toggle').addEventListener('change', (e) => {
+                const debugButtons = document.getElementById('debug-buttons');
+                debugButtons.style.display = e.target.checked ? 'flex' : 'none';
+                saveConfig();
+                showToast(e.target.checked ? '✓ Debug buttons enabled' : '✓ Debug buttons hidden', 'success');
+            });
+
+            // Bulk selection event listeners
+            document.getElementById('bulk-select-toggle').addEventListener('click', toggleBulkMode);
+            
+            document.getElementById('bulk-add-btn').addEventListener('click', () => {
+                if (selectedHistoryItems.size === 0) {
+                    showToast('Please select at least one item', 'error');
+                    return;
+                }
+                
+                // Show store selector
+                const storeGrid = document.getElementById('bulk-store-grid');
+                storeGrid.innerHTML = appData.stores.map(store => `
+                    <div class="history-store-checkbox">
+                        <input type="checkbox" id="bulk-${store.replace(/\s+/g, '-')}" data-store="${store}">
+                        <label for="bulk-${store.replace(/\s+/g, '-')}">${store}</label>
+                    </div>
+                `).join('');
+                
+                document.getElementById('bulk-store-selector').classList.add('visible');
+            });
+            
+            document.getElementById('bulk-cancel-btn').addEventListener('click', toggleBulkMode);
+            
+            document.getElementById('bulk-store-cancel').addEventListener('click', () => {
+                document.getElementById('bulk-store-selector').classList.remove('visible');
+            });
+            
+            document.getElementById('bulk-confirm-add').addEventListener('click', () => {
+                const selectedStores = Array.from(document.querySelectorAll('#bulk-store-grid input:checked'))
+                    .map(cb => cb.dataset.store);
+                
+                if (selectedStores.length === 0) {
+                    showToast('Please select at least one store', 'error');
+                    return;
+                }
+                
+                let totalAdded = 0;
+                const itemsArray = Array.from(selectedHistoryItems);
+                
+                itemsArray.forEach(itemName => {
+                    selectedStores.forEach(store => {
+                        if (!appData.lists[store].find(item => item.name.toLowerCase() === itemName.toLowerCase())) {
+                            appData.lists[store].push({
+                                name: itemName,
+                                checked: false,
+                                id: Date.now() + Math.random()
+                            });
+                            totalAdded++;
+                        }
+                    });
+                });
+                
+                if (totalAdded > 0) {
+                    saveToJSONBin();
+                    renderLists();
+                    showToast(`✓ Added ${itemsArray.length} item(s) to ${selectedStores.length} store(s)`);
+                    toggleBulkMode();
+                } else {
+                    showToast('All items already in selected stores', 'error');
+                }
             });
         }
 
@@ -991,19 +1422,22 @@
                 return;
             }
 
-            // Add to selected lists
+            // Add to selected lists (check for duplicates)
+            let addedCount = 0;
             selectedStores.forEach(store => {
-                if (!appData.lists[store].find(item => item.name === itemName)) {
+                // Only add if not already in the list
+                if (!appData.lists[store].find(item => item.name.toLowerCase() === itemName.toLowerCase())) {
                     appData.lists[store].push({
                         name: itemName,
                         checked: false,
                         id: Date.now() + Math.random()
                     });
+                    addedCount++;
                 }
             });
 
             // Add to history if not exists
-            if (!appData.history.includes(itemName)) {
+            if (!appData.history.find(h => h.toLowerCase() === itemName.toLowerCase())) {
                 appData.history.push(itemName);
             }
 
@@ -1017,7 +1451,11 @@
             renderLists();
             renderHistory();
 
-            showToast(`✓ Added "${itemName}" to ${selectedStores.join(', ')}`);
+            if (addedCount > 0) {
+                showToast(`✓ Added "${itemName}" to ${addedCount} store(s)`);
+            } else {
+                showToast(`"${itemName}" already in selected stores`, 'error');
+            }
         }
 
         // Render Lists
@@ -1054,7 +1492,28 @@
                     <div class="list-header">
                         <h3 class="list-title">${store} <span style="font-size: 0.9rem; color: var(--text-secondary);">(${uncheckedCount})</span></h3>
                         <div class="list-actions">
+                            <button class="btn btn-small remove-bought-btn" data-store="${store}" style="background: var(--success); color: white; margin-right: 8px;">Remove Bought</button>
                             <button class="btn btn-danger btn-small clear-list-btn" data-store="${store}">Clear All</button>
+                        </div>
+                    </div>
+                    <div class="history-dropdown-container">
+                        <button class="history-dropdown-btn" data-store="${store}">
+                            <span>📋 Add from History</span>
+                            <span>▼</span>
+                        </button>
+                        <div class="history-dropdown-content" id="history-dropdown-${store.replace(/\s+/g, '-')}">
+                            <div style="max-height: 240px; overflow-y: auto;">
+                                ${appData.history.map(item => `
+                                    <div class="history-dropdown-item">
+                                        <input type="checkbox" id="hist-${store.replace(/\s+/g, '-')}-${item.replace(/\s+/g, '-')}" value="${item}">
+                                        <label for="hist-${store.replace(/\s+/g, '-')}-${item.replace(/\s+/g, '-')}">${item}</label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="history-dropdown-footer">
+                                <button class="btn btn-primary btn-small add-selected-btn" style="flex: 1;">Add Selected</button>
+                                <button class="btn btn-small cancel-btn" style="background: var(--text-secondary); color: white;">Cancel</button>
+                            </div>
                         </div>
                     </div>
                     <div class="quick-add-inline">
@@ -1073,6 +1532,59 @@
                 items.forEach(item => {
                     const itemEl = createGroceryItem(item, store);
                     itemsContainer.appendChild(itemEl);
+                });
+
+                // History dropdown functionality
+                const dropdownBtn = listCard.querySelector('.history-dropdown-btn');
+                const dropdownContent = listCard.querySelector('.history-dropdown-content');
+                const addSelectedBtn = listCard.querySelector('.add-selected-btn');
+                const cancelBtn = listCard.querySelector('.cancel-btn');
+                
+                dropdownBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // Close other dropdowns
+                    document.querySelectorAll('.history-dropdown-content').forEach(dd => {
+                        if (dd !== dropdownContent) dd.classList.remove('visible');
+                    });
+                    dropdownContent.classList.toggle('visible');
+                });
+                
+                cancelBtn.addEventListener('click', () => {
+                    dropdownContent.classList.remove('visible');
+                    dropdownContent.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                });
+                
+                addSelectedBtn.addEventListener('click', () => {
+                    const selectedItems = Array.from(dropdownContent.querySelectorAll('input[type="checkbox"]:checked'))
+                        .map(cb => cb.value);
+                    
+                    if (selectedItems.length === 0) {
+                        showToast('Please select at least one item', 'error');
+                        return;
+                    }
+                    
+                    let addedCount = 0;
+                    selectedItems.forEach(itemName => {
+                        if (!appData.lists[store].find(item => item.name.toLowerCase() === itemName.toLowerCase())) {
+                            appData.lists[store].push({
+                                name: itemName,
+                                checked: false,
+                                id: Date.now() + Math.random()
+                            });
+                            addedCount++;
+                        }
+                    });
+                    
+                    if (addedCount > 0) {
+                        saveToJSONBin();
+                        renderLists();
+                        showToast(`✓ Added ${addedCount} item(s) to ${store}`);
+                    } else {
+                        showToast('Items already in list', 'error');
+                    }
+                    
+                    dropdownContent.classList.remove('visible');
+                    dropdownContent.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
                 });
 
                 // Quick add functionality
@@ -1105,10 +1617,35 @@
                         return;
                     }
                     
-                    appData.lists[store] = [];
+                    if (confirm(`Clear ALL items from ${store}?`)) {
+                        appData.lists[store] = [];
+                        saveToJSONBin();
+                        renderLists();
+                        showToast(`✓ Cleared all items from ${store}`);
+                    }
+                });
+
+                // Remove bought items
+                listCard.querySelector('.remove-bought-btn').addEventListener('click', () => {
+                    const boughtItems = appData.lists[store].filter(item => item.checked);
+                    
+                    if (boughtItems.length === 0) {
+                        showToast('No bought items to remove', 'error');
+                        return;
+                    }
+                    
+                    // Remove bought items from ALL stores
+                    boughtItems.forEach(boughtItem => {
+                        appData.stores.forEach(storeName => {
+                            appData.lists[storeName] = appData.lists[storeName].filter(
+                                item => item.name.toLowerCase() !== boughtItem.name.toLowerCase()
+                            );
+                        });
+                    });
+                    
                     saveToJSONBin();
                     renderLists();
-                    showToast(`✓ Cleared all items from ${store}`);
+                    showToast(`✓ Removed ${boughtItems.length} bought item(s) from all stores`);
                 });
             });
         }
@@ -1118,21 +1655,25 @@
                 appData.lists[store] = [];
             }
 
-            if (!appData.lists[store].find(item => item.name === itemName)) {
-                appData.lists[store].push({
-                    name: itemName,
-                    checked: false,
-                    id: Date.now() + Math.random()
-                });
-
-                if (!appData.history.includes(itemName)) {
-                    appData.history.push(itemName);
-                }
-
-                saveToJSONBin();
-                renderLists();
-                renderHistory();
+            // Check for duplicates (case insensitive)
+            if (appData.lists[store].find(item => item.name.toLowerCase() === itemName.toLowerCase())) {
+                showToast(`"${itemName}" already in ${store}`, 'error');
+                return;
             }
+
+            appData.lists[store].push({
+                name: itemName,
+                checked: false,
+                id: Date.now() + Math.random()
+            });
+
+            if (!appData.history.find(h => h.toLowerCase() === itemName.toLowerCase())) {
+                appData.history.push(itemName);
+            }
+
+            saveToJSONBin();
+            renderLists();
+            renderHistory();
         }
 
         function createGroceryItem(item, store) {
@@ -1147,6 +1688,7 @@
 
             const checkbox = div.querySelector('input');
             checkbox.addEventListener('change', () => {
+                // Just mark as checked, don't delete
                 item.checked = checkbox.checked;
                 div.classList.toggle('checked', checkbox.checked);
                 saveToJSONBin();
@@ -1154,13 +1696,70 @@
 
             const deleteBtn = div.querySelector('button');
             deleteBtn.addEventListener('click', () => {
-                const index = appData.lists[store].findIndex(i => i.id === item.id);
-                appData.lists[store].splice(index, 1);
-                saveToJSONBin();
-                renderLists();
+                showDeleteModal(item.name, store);
             });
 
             return div;
+        }
+
+        // Delete modal functions
+        function showDeleteModal(itemName, storeName) {
+            const overlay = document.getElementById('delete-modal-overlay');
+            const itemSpan = document.getElementById('delete-modal-item');
+            const storeNameSpan = document.getElementById('delete-store-name');
+            
+            itemSpan.textContent = `"${itemName}"`;
+            storeNameSpan.textContent = storeName;
+            
+            overlay.classList.add('visible');
+            
+            // Remove old event listeners by cloning buttons
+            const deleteAllBtn = document.getElementById('delete-all-stores');
+            const deleteThisBtn = document.getElementById('delete-this-store');
+            const cancelBtn = document.getElementById('delete-cancel');
+            
+            const newDeleteAllBtn = deleteAllBtn.cloneNode(true);
+            const newDeleteThisBtn = deleteThisBtn.cloneNode(true);
+            const newCancelBtn = cancelBtn.cloneNode(true);
+            
+            deleteAllBtn.replaceWith(newDeleteAllBtn);
+            deleteThisBtn.replaceWith(newDeleteThisBtn);
+            cancelBtn.replaceWith(newCancelBtn);
+            
+            // Add new event listeners
+            document.getElementById('delete-all-stores').addEventListener('click', () => {
+                deleteFromAllStores(itemName);
+                overlay.classList.remove('visible');
+            });
+            
+            document.getElementById('delete-this-store').addEventListener('click', () => {
+                deleteFromOneStore(itemName, storeName);
+                overlay.classList.remove('visible');
+            });
+            
+            document.getElementById('delete-cancel').addEventListener('click', () => {
+                overlay.classList.remove('visible');
+            });
+        }
+
+        function deleteFromAllStores(itemName) {
+            appData.stores.forEach(storeName => {
+                appData.lists[storeName] = appData.lists[storeName].filter(
+                    i => i.name.toLowerCase() !== itemName.toLowerCase()
+                );
+            });
+            saveToJSONBin();
+            renderLists();
+            showToast(`✓ Removed "${itemName}" from all stores`);
+        }
+
+        function deleteFromOneStore(itemName, storeName) {
+            appData.lists[storeName] = appData.lists[storeName].filter(
+                i => i.name.toLowerCase() !== itemName.toLowerCase()
+            );
+            saveToJSONBin();
+            renderLists();
+            showToast(`✓ Removed "${itemName}" from ${storeName}`);
         }
 
         // Store Manager
@@ -1223,6 +1822,9 @@
         }
 
         // History
+        let bulkSelectMode = false;
+        let selectedHistoryItems = new Set();
+
         function renderHistory() {
             const container = document.getElementById('history-list');
             
@@ -1232,21 +1834,143 @@
             }
 
             container.innerHTML = '';
-            appData.history.forEach(itemName => {
+            
+            // Sort history alphabetically (case-insensitive)
+            const sortedHistory = [...appData.history].sort((a, b) => 
+                a.toLowerCase().localeCompare(b.toLowerCase())
+            );
+            
+            sortedHistory.forEach(itemName => {
                 const historyItem = document.createElement('div');
                 historyItem.className = 'history-item';
+                
+                const itemId = 'history-' + itemName.replace(/\s+/g, '-');
+                const isSelected = selectedHistoryItems.has(itemName);
+                
                 historyItem.innerHTML = `
-                    <span class="history-item-name">${itemName}</span>
-                    <button class="btn btn-accent btn-small">Add Again</button>
+                    <div class="history-item-header">
+                        <input type="checkbox" class="history-item-checkbox" data-item="${itemName}" ${isSelected ? 'checked' : ''}>
+                        <span class="history-item-name">${itemName}</span>
+                        <div class="history-item-actions">
+                            <button class="history-expand-btn">▼</button>
+                        </div>
+                    </div>
+                    <div class="history-item-stores" id="${itemId}">
+                        <div class="history-store-grid">
+                            ${appData.stores.map(store => `
+                                <div class="history-store-checkbox">
+                                    <input type="checkbox" id="${itemId}-${store.replace(/\s+/g, '-')}" data-store="${store}">
+                                    <label for="${itemId}-${store.replace(/\s+/g, '-')}">${store}</label>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="btn btn-primary btn-small add-to-stores-btn">Add to Selected Stores</button>
+                    </div>
                 `;
                 
-                historyItem.querySelector('button').addEventListener('click', () => {
-                    document.getElementById('item-name').value = itemName;
-                    switchTab('add');
+                const checkbox = historyItem.querySelector('.history-item-checkbox');
+                const expandBtn = historyItem.querySelector('.history-expand-btn');
+                const storesSection = historyItem.querySelector('.history-item-stores');
+                const addBtn = historyItem.querySelector('.add-to-stores-btn');
+                const header = historyItem.querySelector('.history-item-header');
+                
+                // Checkbox for bulk mode
+                checkbox.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Let checkbox work naturally
                 });
-
+                
+                checkbox.addEventListener('change', (e) => {
+                    if (checkbox.checked) {
+                        selectedHistoryItems.add(itemName);
+                    } else {
+                        selectedHistoryItems.delete(itemName);
+                    }
+                    updateBulkCount();
+                });
+                
+                // Click header in bulk mode to toggle checkbox (but not if clicking checkbox itself)
+                header.addEventListener('click', (e) => {
+                    if (bulkSelectMode && !e.target.classList.contains('history-expand-btn') && 
+                        !e.target.classList.contains('history-item-checkbox')) {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change'));
+                    }
+                });
+                
+                expandBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!bulkSelectMode) {
+                        const isVisible = storesSection.classList.contains('visible');
+                        storesSection.classList.toggle('visible');
+                        expandBtn.classList.toggle('expanded');
+                    }
+                });
+                
+                addBtn.addEventListener('click', () => {
+                    const selectedStores = Array.from(storesSection.querySelectorAll('input[type="checkbox"]:checked'))
+                        .map(cb => cb.dataset.store);
+                    
+                    if (selectedStores.length === 0) {
+                        showToast('Please select at least one store', 'error');
+                        return;
+                    }
+                    
+                    let addedCount = 0;
+                    selectedStores.forEach(store => {
+                        if (!appData.lists[store].find(item => item.name.toLowerCase() === itemName.toLowerCase())) {
+                            appData.lists[store].push({
+                                name: itemName,
+                                checked: false,
+                                id: Date.now() + Math.random()
+                            });
+                            addedCount++;
+                        }
+                    });
+                    
+                    if (addedCount > 0) {
+                        saveToJSONBin();
+                        renderLists();
+                        showToast(`✓ Added "${itemName}" to ${addedCount} store(s)`);
+                        
+                        // Clear checkboxes and collapse
+                        storesSection.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                        storesSection.classList.remove('visible');
+                        expandBtn.classList.remove('expanded');
+                    } else {
+                        showToast(`"${itemName}" already in selected stores`, 'error');
+                    }
+                });
+                
                 container.appendChild(historyItem);
             });
+        }
+
+        function updateBulkCount() {
+            document.getElementById('bulk-count').textContent = selectedHistoryItems.size;
+        }
+
+        function toggleBulkMode() {
+            bulkSelectMode = !bulkSelectMode;
+            const historyList = document.getElementById('history-list');
+            const bulkBar = document.getElementById('bulk-select-bar');
+            const toggleBtn = document.getElementById('bulk-select-toggle');
+            
+            if (bulkSelectMode) {
+                historyList.classList.add('bulk-mode');
+                bulkBar.classList.add('active');
+                toggleBtn.textContent = 'Cancel Selection';
+                toggleBtn.style.background = 'var(--text-secondary)';
+                toggleBtn.style.color = 'white';
+            } else {
+                historyList.classList.remove('bulk-mode');
+                bulkBar.classList.remove('active');
+                toggleBtn.textContent = 'Select Multiple';
+                toggleBtn.style.background = '';
+                toggleBtn.style.color = '';
+                selectedHistoryItems.clear();
+                document.getElementById('bulk-store-selector').classList.remove('visible');
+                renderHistory();
+            }
         }
 
         // Configuration
@@ -1311,6 +2035,22 @@
 
         // Start the app
         init();
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.history-dropdown-container')) {
+                document.querySelectorAll('.history-dropdown-content').forEach(dd => {
+                    dd.classList.remove('visible');
+                });
+            }
+        });
+
+        // Close delete modal when clicking overlay
+        document.getElementById('delete-modal-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'delete-modal-overlay') {
+                e.target.classList.remove('visible');
+            }
+        });
 
         // Auto-refresh every 30 seconds to sync changes from other devices
         setInterval(async () => {
