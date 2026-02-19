@@ -1,0 +1,252 @@
+/* Button size overrides - Make buttons touch-friendly */
+.btn {
+    padding: 10px 16px !important;
+    font-size: 0.85rem !important;
+    white-space: nowrap !important;
+    min-width: auto !important;
+    min-height: 36px !important; /* Better tap target */
+}
+
+.btn-small {
+    padding: 8px 14px !important;
+    font-size: 0.8rem !important;
+    min-height: 32px !important;
+}
+
+.btn-xs {
+    padding: 6px 12px !important;
+    font-size: 0.75rem !important;
+    min-height: 30px !important;
+}
+
+/* List header buttons - still compact but tappable */
+.list-header-compact .btn {
+    padding: 6px 12px !important;
+    font-size: 0.75rem !important;
+    min-height: 30px !important;
+}
+
+/* Store management buttons */
+.store-item-compact .btn {
+    padding: 6px 12px !important;
+    font-size: 0.75rem !important;
+    min-height: 30px !important;
+}
+
+/* History dropdown footer buttons */
+.history-dropdown-footer .btn {
+    padding: 8px 14px !important;
+    font-size: 0.8rem !important;
+    min-height: 32px !important;
+}
+
+/* Add to Stores button in bulk mode */
+#bulk-store-selector .btn {
+    padding: 10px 18px !important;
+    font-size: 0.85rem !important;
+    min-height: 36px !important;
+}
+
+/* Logout button */
+.logout-btn {
+    padding: 8px 14px !important;
+    font-size: 0.8rem !important;
+    min-height: 32px !important;
+}
+
+/* Auth buttons - larger for easy tapping */
+.btn-primary {
+    padding: 14px 24px !important;
+    font-size: 0.95rem !important;
+    min-height: 44px !important;
+}
+
+/* Store add button */
+#stores-tab .btn-primary {
+    padding: 12px 18px !important;
+    font-size: 0.9rem !important;
+    min-height: 40px !important;
+}
+
+/* Make text inputs properly sized */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+.quick-add-input {
+    padding: 12px 14px !important;
+    font-size: 0.95rem !important;
+    min-height: 44px !important; /* Touch-friendly */
+}
+
+/* Auth form inputs */
+.auth-form input {
+    padding: 14px 16px !important;
+    font-size: 1rem !important;
+    min-height: 48px !important;
+}
+
+/* Better button group spacing */
+.btn-group-compact {
+    gap: 6px !important;
+}
+
+/* Prevent buttons from being too wide */
+button {
+    max-width: fit-content !important;
+}
+
+/* Delete Modal Styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-overlay.visible {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal {
+    background: white;
+    border-radius: 20px;
+    max-width: 90%;
+    width: 400px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+    overflow: hidden;
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-item-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0891B2;
+    margin: 0 0 12px 0;
+}
+
+.modal-subtitle {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.modal-footer {
+    padding: 16px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-btn-danger {
+    background: #EF4444 !important;
+    color: white !important;
+    padding: 14px 20px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.modal-btn-danger:hover {
+    background: #DC2626 !important;
+}
+
+.modal-btn-warning {
+    background: #F97316 !important;
+    color: white !important;
+    padding: 14px 20px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    justify-content: center !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.modal-btn-warning:hover {
+    background: #EA580C !important;
+}
+
+.modal-btn-cancel {
+    background: #e2e8f0 !important;
+    color: #475569 !important;
+    padding: 12px 20px !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.modal-btn-cancel:hover {
+    background: #cbd5e1 !important;
+}
+
+/* Mobile modal adjustments */
+@media (max-width: 768px) {
+    .modal {
+        width: 85%;
+        max-width: 85%;
+    }
+    
+    .modal-footer {
+        gap: 8px;
+    }
+}
+
+/* Better touch targets on mobile */
+@media (max-width: 768px) {
+    .btn {
+        min-height: 40px !important;
+        padding: 10px 18px !important;
+    }
+    
+    .btn-small, .btn-xs {
+        min-height: 36px !important;
+        padding: 8px 14px !important;
+    }
+}
+
