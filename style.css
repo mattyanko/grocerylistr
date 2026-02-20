@@ -367,24 +367,6 @@ button {
     text-align: center;
 }
 
-.btn-bought {
-    background: var(--success) !important;
-    color: white !important;
-    padding: 8px 12px !important;
-    font-size: 0.75rem !important;
-    min-height: 36px !important;
-    touch-action: manipulation;
-}
-
-.btn-clear {
-    background: var(--danger) !important;
-    color: white !important;
-    padding: 8px 12px !important;
-    font-size: 0.75rem !important;
-    min-height: 36px !important;
-    touch-action: manipulation;
-}
-
 .store-content {
     overflow: hidden;
     transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
