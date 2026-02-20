@@ -323,14 +323,30 @@ button {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px;
+    padding: 16px;
     cursor: pointer;
     border-radius: 12px;
     transition: background 0.2s;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(8, 145, 178, 0.1);
+    touch-action: manipulation;
 }
 
-.store-header:hover {
-    background: rgba(8, 145, 178, 0.05);
+.store-header:active {
+    background: rgba(8, 145, 178, 0.08);
+}
+
+.store-header-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.store-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .store-title {
@@ -342,13 +358,31 @@ button {
 .store-count {
     color: var(--text-secondary);
     font-size: 0.9rem;
-    margin-left: 6px;
 }
 
 .store-toggle {
-    font-size: 0.9rem;
+    font-size: 1.2rem;
     color: var(--text-secondary);
-    margin-left: 8px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.btn-bought {
+    background: var(--success) !important;
+    color: white !important;
+    padding: 8px 12px !important;
+    font-size: 0.75rem !important;
+    min-height: 36px !important;
+    touch-action: manipulation;
+}
+
+.btn-clear {
+    background: var(--danger) !important;
+    color: white !important;
+    padding: 8px 12px !important;
+    font-size: 0.75rem !important;
+    min-height: 36px !important;
+    touch-action: manipulation;
 }
 
 .store-content {
