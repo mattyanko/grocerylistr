@@ -730,7 +730,7 @@
             }
         }
     </style>
-  <script type="module" crossorigin src="./assets/index-C3jBGEP-.js"></script>
+  <script type="module" crossorigin src="./assets/index-BhyC6qQH.js"></script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -787,10 +787,39 @@
     <div id="app-container">
         <div class="app-header">
             <div class="header-top">
-                <div class="header-title" id="header-title">My Lists</div>
-                <button class="logout-btn" id="logout-btn">Logout</button>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="header-title" id="header-title">My Lists</div>
+                        <div id="share-indicator" style="display: none;"></div>
+                    </div>
+                    <div class="header-subtitle" id="header-subtitle">Loading...</div>
+                </div>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMenu()">☰</button>
+                </div>
             </div>
-            <div class="header-subtitle" id="header-subtitle">Loading...</div>
+        </div>
+
+        <!-- Hamburger Menu -->
+        <div class="hamburger-menu" id="hamburger-menu">
+            <div class="hamburger-menu-content">
+                <div class="hamburger-header">
+                    <h3>Menu</h3>
+                    <button class="hamburger-close" onclick="toggleMenu()">✕</button>
+                </div>
+                <div class="hamburger-item" onclick="openManageSharing()">
+                    <span>👥</span>
+                    <span>Manage Sharing</span>
+                </div>
+                <div class="hamburger-item" onclick="openSettings()">
+                    <span>⚙️</span>
+                    <span>Settings</span>
+                </div>
+                <div class="hamburger-item" onclick="handleLogout()">
+                    <span>🚪</span>
+                    <span>Sign Out</span>
+                </div>
+            </div>
         </div>
 
         <div class="app-content">
@@ -827,6 +856,16 @@
 
             <!-- History Tab -->
             <div id="history-tab" class="tab-content">
+                <!-- Will be populated by JavaScript -->
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="tab-content">
+                <!-- Will be populated by JavaScript -->
+            </div>
+
+            <!-- Manage Sharing Tab -->
+            <div id="manage-sharing-tab" class="tab-content">
                 <!-- Will be populated by JavaScript -->
             </div>
         </div>
