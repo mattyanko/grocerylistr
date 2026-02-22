@@ -635,7 +635,7 @@ input[type="password"],
 }
 
 .qty-controls-inline.expanded {
-    max-height: 140px;
+    max-height: 180px;
     opacity: 1;
     padding: 12px 14px;
     border: 2px solid var(--border);
