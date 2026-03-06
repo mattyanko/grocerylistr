@@ -1227,7 +1227,7 @@ input[type="password"],
 /* FAB Button */
 .fab-btn {
     position: fixed;
-    bottom: 80px;
+    bottom: 100px;
     right: 20px;
     width: 56px;
     height: 56px;
