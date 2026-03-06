@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="Zy-ZO3bzNwFVX_zNGcGDBrtYompe1nDwpFrl6F27e3g" />
     <title>GroceryList</title>
     
     <!-- PWA Meta Tags -->
@@ -16,7 +17,7 @@
     <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="./style.css">
     
-  <script type="module" crossorigin src="./assets/index-7fbyCofU.js"></script>
+  <script type="module" crossorigin src="./assets/index-BYpYDQcH.js"></script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -146,37 +147,8 @@
         </div>
 
         <div class="app-content">
-            <!-- Add Item Tab -->
-            <div id="add-tab" class="tab-content active">
-                <div class="card">
-                    <div class="card-title">Add New Item</div>
-                    <div class="input-group">
-                        <label>Item Name</label>
-                        <div class="input-with-autocomplete">
-                            <input type="text" id="item-name" placeholder="e.g., Eggs" autocomplete="off">
-                            <div class="autocomplete-dropdown" id="item-name-autocomplete"></div>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label>Quantity</label>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <button class="qty-add-btn" onclick="adjustAddQuantity(-1)" type="button">−</button>
-                            <span id="add-quantity-display" style="font-size: 1.5rem; font-weight: 700; min-width: 40px; text-align: center; color: var(--primary);">1</span>
-                            <button class="qty-add-btn" onclick="adjustAddQuantity(1)" type="button">+</button>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label>Select Stores</label>
-                        <div class="store-selector" id="store-selector">
-                            <!-- Store chips will be populated here -->
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" id="add-item-btn">Add to Selected Stores</button>
-                </div>
-            </div>
-
             <!-- Lists Tab -->
-            <div id="lists-tab" class="tab-content">
+            <div id="lists-tab" class="tab-content active">
                 <!-- Will be populated by JavaScript -->
             </div>
 
@@ -198,6 +170,58 @@
             <!-- Manage Sharing Tab -->
             <div id="manage-sharing-tab" class="tab-content">
                 <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- FAB Add Button -->
+        <button class="fab-btn" id="fab-add-btn">+</button>
+
+        <!-- Add Item Modal -->
+        <div class="modal-overlay" id="add-modal">
+            <div class="modal" style="max-height: 90vh; overflow-y: auto;">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="add-modal-title">Add Item</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <label>Item Name</label>
+                        <div class="input-with-autocomplete">
+                            <input type="text" id="modal-item-name" placeholder="e.g., Eggs" autocomplete="off">
+                            <div class="autocomplete-dropdown" id="modal-item-name-autocomplete"></div>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Quantity</label>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <button class="qty-add-btn" id="modal-qty-minus" type="button">−</button>
+                            <span id="modal-quantity-display" style="font-size: 1.5rem; font-weight: 700; min-width: 40px; text-align: center; color: var(--primary);">1</span>
+                            <button class="qty-add-btn" id="modal-qty-plus" type="button">+</button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Select Stores</label>
+                        <div class="store-selector" id="modal-store-selector"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="modal-add-btn">Add to Selected Stores</button>
+                    <button class="btn modal-btn-cancel" id="modal-cancel-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Remove Bought Modal -->
+        <div class="modal-overlay" id="bought-modal">
+            <div class="modal" style="max-height: 90vh; overflow-y: auto;">
+                <div class="modal-header">
+                    <h3 class="modal-title">Remove Bought Items</h3>
+                    <p style="margin: 4px 0 0; font-size: 0.85rem; color: var(--text-secondary);" id="bought-modal-store"></p>
+                </div>
+                <div class="modal-body" id="bought-modal-body"></div>
+                <div class="modal-footer">
+                    <button class="btn modal-btn-danger" id="bought-confirm-btn">Remove Selected</button>
+                    <button class="btn modal-btn-cancel" id="bought-cancel-btn">Cancel</button>
+                </div>
             </div>
         </div>
 
@@ -249,11 +273,7 @@
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
             <div class="nav-items">
-                <div class="nav-item active" data-tab="add">
-                    <div class="nav-icon">+</div>
-                    <div class="nav-label">Add</div>
-                </div>
-                <div class="nav-item" data-tab="lists">
+                <div class="nav-item active" data-tab="lists">
                     <div class="nav-icon">☰</div>
                     <div class="nav-label">Lists</div>
                 </div>

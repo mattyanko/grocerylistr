@@ -1224,3 +1224,94 @@ input[type="password"],
     font-size: 0.85rem;
     color: var(--text-secondary);
 }
+/* FAB Button */
+.fab-btn {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(8, 145, 178, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.fab-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(8, 145, 178, 0.55);
+}
+.fab-btn:active {
+    transform: scale(0.95);
+}
+
+/* Lists sub-tabs */
+.lists-subtabs {
+    display: flex;
+    gap: 8px;
+    padding: 0 4px 12px;
+}
+.lists-subtab {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-card);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+.lists-subtab.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* Remove Bought modal item rows */
+.bought-item-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+.bought-item-row:last-child {
+    border-bottom: none;
+}
+.bought-item-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.bought-item-options {
+    display: flex;
+    gap: 8px;
+}
+.bought-opt-btn {
+    flex: 1;
+    padding: 8px 6px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-main);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+.bought-opt-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
