@@ -1253,29 +1253,42 @@ input[type="password"],
     transform: scale(0.95);
 }
 
-/* Lists sub-tabs */
+/* Lists sub-tabs — icon + pill style */
 .lists-subtabs {
     display: flex;
-    gap: 8px;
-    padding: 0 4px 12px;
+    background: var(--bg-main);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 4px;
+    gap: 4px;
+    margin-bottom: 14px;
 }
 .lists-subtab {
     flex: 1;
-    padding: 10px;
-    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 12px;
+    border: 2px solid transparent;
     border-radius: 10px;
-    background: var(--bg-card);
-    font-size: 0.95rem;
+    background: transparent;
+    font-size: 0.92rem;
     font-weight: 600;
     color: var(--text-secondary);
     cursor: pointer;
     font-family: inherit;
     transition: all 0.2s;
 }
+.lists-subtab .tab-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
 .lists-subtab.active {
     background: var(--primary);
     border-color: var(--primary);
     color: white;
+    box-shadow: 0 2px 8px rgba(8, 145, 178, 0.4);
 }
 
 /* Remove Bought modal item rows */
