@@ -17,7 +17,7 @@
     <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="./style.css">
     
-  <script type="module" crossorigin src="./assets/index-BS3t_FjZ.js"></script>
+  <script type="module" crossorigin src="./assets/index-IznYQWTM.js"></script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -162,6 +162,11 @@
                 <!-- Will be populated by JavaScript -->
             </div>
 
+            <!-- Feed Tab -->
+            <div id="feed-tab" class="tab-content">
+                <!-- Will be populated by JavaScript -->
+            </div>
+
             <!-- Settings Tab -->
             <div id="settings-tab" class="tab-content">
                 <!-- Will be populated by JavaScript -->
@@ -270,6 +275,23 @@
             </div>
         </div>
 
+        <!-- Category Prompt Modal -->
+        <div class="modal-overlay" id="category-prompt-modal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">Categorize Item</h3>
+                    <p style="margin: 4px 0 0; font-size: 0.85rem; color: var(--text-secondary);" id="category-prompt-item-name"></p>
+                </div>
+                <div class="modal-body">
+                    <p style="margin: 0 0 12px; color: var(--text-secondary); font-size: 0.9rem;">What category is this item? (optional)</p>
+                    <div id="category-chips" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn modal-btn-cancel" id="category-prompt-skip-btn">Skip</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
             <div class="nav-items">
@@ -284,6 +306,10 @@
                 <div class="nav-item" data-tab="history">
                     <div class="nav-icon">⟲</div>
                     <div class="nav-label">History</div>
+                </div>
+                <div class="nav-item" data-tab="feed">
+                    <div class="nav-icon">✨</div>
+                    <div class="nav-label">Feed</div>
                 </div>
             </div>
         </div>
