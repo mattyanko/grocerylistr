@@ -17,7 +17,7 @@
     <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="./style.css">
     
-  <script type="module" crossorigin src="./assets/index-IznYQWTM.js"></script>
+  <script type="module" crossorigin src="./assets/index-CIbqv6KR.js"></script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -69,6 +69,9 @@
                 <div class="auth-switch">
                     Don't have an account? <a id="show-signup">Sign up</a>
                 </div>
+                <div class="auth-legal">
+                    By continuing, you agree to our <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
+                </div>
             </div>
 
             <!-- Signup Form -->
@@ -103,7 +106,55 @@
                 <div class="auth-switch">
                     Already have an account? <a id="show-login">Sign in</a>
                 </div>
+                <div class="auth-legal">
+                    By continuing, you agree to our <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div id="delete-account-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:white; border-radius:20px; max-width:440px; width:100%; padding:32px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <div style="text-align:center; margin-bottom:20px;">
+                <div style="font-size:2.5rem; margin-bottom:8px;">⚠️</div>
+                <div style="font-size:1.2rem; font-weight:800; color:#dc2626;">Delete Account</div>
+                <div style="font-size:0.875rem; color:#64748b; margin-top:6px; line-height:1.5;">This will permanently delete your account, all your grocery lists, history, and categories. <strong>This cannot be undone.</strong></div>
+            </div>
+            <div style="background:#fef2f2; border-radius:10px; padding:14px 16px; margin-bottom:20px; font-size:0.875rem; color:#7f1d1d;">
+                Type <strong>DELETE</strong> below to confirm:
+            </div>
+            <input id="delete-confirm-input" type="text" placeholder="Type DELETE here" style="width:100%; padding:12px; border:1.5px solid #fca5a5; border-radius:10px; font-size:1rem; margin-bottom:8px; outline:none; text-align:center; letter-spacing:2px;">
+            <div id="delete-account-error" style="color:#dc2626; font-size:0.8rem; text-align:center; margin-bottom:12px; min-height:18px;"></div>
+            <button id="delete-account-confirm-btn" onclick="window.confirmDeleteAccount()" style="width:100%; padding:13px; background:#dc2626; color:white; border:none; border-radius:10px; font-size:0.95rem; font-weight:700; cursor:pointer; margin-bottom:10px;">Delete My Account</button>
+            <button onclick="window.closeDeleteAccountModal()" style="width:100%; padding:11px; background:transparent; color:#94a3b8; border:none; font-size:0.9rem; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Terms Acceptance Modal -->
+    <div id="terms-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:none; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:white; border-radius:20px; max-width:480px; width:100%; padding:32px; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <div style="text-align:center; margin-bottom:24px;">
+                <div style="font-size:2.5rem; margin-bottom:8px;">🛒</div>
+                <div style="font-size:1.3rem; font-weight:800; color:#0891B2;">Welcome to GetList</div>
+                <div style="font-size:0.9rem; color:#64748b; margin-top:6px;">Before you continue, please review and accept our terms</div>
+            </div>
+            <div style="background:#f8fafc; border-radius:12px; padding:16px 20px; margin-bottom:24px; font-size:0.875rem; color:#334155; line-height:1.6;">
+                <div style="margin-bottom:8px;">By using GetList you agree that:</div>
+                <ul style="margin-left:16px; color:#475569;">
+                    <li style="margin-bottom:4px;">We store your email and grocery list data securely in Google Firebase</li>
+                    <li style="margin-bottom:4px;">We do not sell or share your data with third parties</li>
+                    <li style="margin-bottom:4px;">You are responsible for what you share and with whom</li>
+                    <li>The service is provided as-is without warranties</li>
+                </ul>
+                <div style="margin-top:12px;">
+                    <a href="/terms" target="_blank" style="color:#0891B2; font-weight:600;">Terms of Service</a>
+                    <span style="color:#94a3b8; margin:0 8px;">·</span>
+                    <a href="/privacy" target="_blank" style="color:#0891B2; font-weight:600;">Privacy Policy</a>
+                </div>
+            </div>
+            <button id="terms-accept-btn" style="width:100%; padding:14px; background:#F97316; color:white; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; margin-bottom:10px;">I Accept</button>
+            <button id="terms-decline-btn" style="width:100%; padding:12px; background:transparent; color:#94a3b8; border:none; font-size:0.9rem; cursor:pointer;">Decline &amp; Sign Out</button>
         </div>
     </div>
 
@@ -185,9 +236,16 @@
         <div class="modal-overlay" id="add-modal">
             <div class="modal" style="max-height: 90vh; overflow-y: auto;">
                 <div class="modal-header">
-                    <h3 class="modal-title" id="add-modal-title">Add Item</h3>
+                    <h3 class="modal-title" id="add-modal-title">Add Items</h3>
                 </div>
                 <div class="modal-body">
+                    <!-- Store selector always visible at top -->
+                    <div class="input-group">
+                        <label>Add to Stores</label>
+                        <div class="store-selector" id="modal-store-selector"></div>
+                    </div>
+
+                    <!-- Item name + qty + add button -->
                     <div class="input-group">
                         <label>Item Name</label>
                         <div class="input-with-autocomplete">
@@ -195,21 +253,23 @@
                             <div class="autocomplete-dropdown" id="modal-item-name-autocomplete"></div>
                         </div>
                     </div>
-                    <div class="input-group">
-                        <label>Quantity</label>
-                        <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+                        <div style="display:flex; align-items:center; gap:12px;">
                             <button class="qty-add-btn" id="modal-qty-minus" type="button">−</button>
-                            <span id="modal-quantity-display" style="font-size: 1.5rem; font-weight: 700; min-width: 40px; text-align: center; color: var(--primary);">1</span>
+                            <span id="modal-quantity-display" style="font-size:1.5rem; font-weight:700; min-width:40px; text-align:center; color:var(--primary);">1</span>
                             <button class="qty-add-btn" id="modal-qty-plus" type="button">+</button>
                         </div>
+                        <button class="btn btn-primary" id="modal-add-btn" style="padding:10px 22px; font-size:0.95rem;">+ Add</button>
                     </div>
-                    <div class="input-group">
-                        <label>Select Stores</label>
-                        <div class="store-selector" id="modal-store-selector"></div>
+
+                    <!-- Pending items list (hidden until items added) -->
+                    <div id="modal-pending-section" style="display:none;">
+                        <div style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">Items to Add <span id="modal-pending-count" style="color:var(--primary);"></span></div>
+                        <div id="modal-pending-list" style="display:flex; flex-direction:column; gap:6px;"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-primary" id="modal-add-btn">Add to Selected Stores</button>
+                    <button class="btn btn-primary" id="modal-save-btn">Add to Stores</button>
                     <button class="btn modal-btn-cancel" id="modal-cancel-btn">Cancel</button>
                 </div>
             </div>
