@@ -28,6 +28,24 @@
     --warning: #F97316;
 }
 
+/* Dark Mode */
+[data-theme="dark"] {
+    --primary: #22D3EE;
+    --primary-dark: #0891B2;
+    --primary-light: #67E8F9;
+    --accent: #FB923C;
+    --accent-hover: #F97316;
+    --bg-main: #0f172a;
+    --bg-card: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border: #334155;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --success: #34D399;
+    --danger: #F87171;
+    --warning: #FB923C;
+}
+
 /* Body */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
@@ -104,7 +122,7 @@ body {
 .auth-form {
     width: 100%;
     max-width: 400px;
-    background: white;
+    background: var(--bg-card);
     padding: 35px;
     border-radius: 24px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
@@ -387,7 +405,7 @@ input[type="password"],
     bottom: 0;
     left: 0;
     right: 0;
-    background: white;
+    background: var(--bg-card);
     box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
     padding: 8px 0 max(env(safe-area-inset-bottom), 8px);
     z-index: 999;
@@ -531,6 +549,21 @@ input[type="password"],
     display: block;
 }
 
+.modal-add-feedback {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #16a34a;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+    white-space: nowrap;
+}
+.modal-add-feedback.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .autocomplete-item {
     padding: 12px 16px;
     cursor: pointer;
@@ -546,6 +579,17 @@ input[type="password"],
 }
 
 /* Grocery Items */
+@keyframes itemCheckOut {
+    0%   { opacity: 1; transform: translateX(0); }
+    25%  { background: rgba(16, 185, 129, 0.15); }
+    100% { opacity: 0; transform: translateY(8px); }
+}
+.grocery-item.checking-out {
+    animation: itemCheckOut 350ms ease forwards;
+    pointer-events: none;
+    transition: none;
+}
+
 .grocery-item {
     display: flex;
     align-items: center;
@@ -554,6 +598,10 @@ input[type="password"],
     border-radius: 12px;
     transition: all 0.2s;
     border: 2px solid transparent;
+    touch-action: pan-y;
+    will-change: transform;
+    position: relative;
+    z-index: 1;
 }
 
 .grocery-item:hover {
@@ -603,6 +651,34 @@ input[type="password"],
 
 .grocery-item-container {
     margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.swipe-bg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    border-radius: 12px;
+}
+.swipe-bg.swipe-right {
+    background: var(--success);
+    justify-content: flex-start;
+    padding-left: 20px;
+    color: white;
+    font-size: 1.4rem;
+}
+.swipe-bg.swipe-left {
+    background: var(--danger);
+    justify-content: flex-end;
+    padding-right: 20px;
+    color: white;
+    font-size: 1.4rem;
 }
 
 .favorite-btn {
@@ -645,7 +721,7 @@ input[type="password"],
     overflow: hidden;
     opacity: 0;
     transition: all 0.3s ease;
-    background: #f8fafc;
+    background: var(--bg-main);
     border-radius: 0 0 12px 12px;
     margin-top: -2px;
     padding: 0 14px;
@@ -664,9 +740,9 @@ input[type="password"],
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 1px solid #d1d5db;
-    background: white;
-    color: #374151;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-primary);
     font-size: 1.5rem;
     font-weight: 400;
     cursor: pointer;
@@ -679,13 +755,13 @@ input[type="password"],
 
 .qty-inline-btn:hover,
 .qty-add-btn:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
+    background: var(--bg-main);
+    border-color: var(--text-secondary);
 }
 
 .qty-inline-btn:active,
 .qty-add-btn:active {
-    background: #f3f4f6;
+    background: var(--bg-main);
     transform: scale(0.95);
 }
 
@@ -806,8 +882,39 @@ input[type="password"],
     }
 }
 
+/* Bottom sheet — add modal */
+.modal-overlay.bottom-sheet {
+    align-items: flex-end;
+}
+.modal-overlay.bottom-sheet .modal {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 24px 24px 0 0;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: sheetSlideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes sheetSlideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+.sheet-close-btn {
+    background: var(--bg-main);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
 .modal {
-    background: white;
+    background: var(--bg-card);
     border-radius: 20px;
     max-width: 90%;
     width: 400px;
@@ -818,13 +925,13 @@ input[type="password"],
 
 .modal-header {
     padding: 20px 24px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border);
 }
 
 .modal-title {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--text-primary);
     margin: 0;
 }
 
@@ -835,13 +942,13 @@ input[type="password"],
 .modal-item-name {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #0891B2;
+    color: var(--primary);
     margin: 0 0 12px 0;
 }
 
 .modal-subtitle {
     font-size: 0.9rem;
-    color: #64748b;
+    color: var(--text-secondary);
     margin: 0;
 }
 
@@ -880,8 +987,8 @@ input[type="password"],
 }
 
 .modal-btn-cancel {
-    background: #e2e8f0;
-    color: #475569;
+    background: var(--border);
+    color: var(--text-secondary);
     padding: 12px 20px;
     font-size: 0.85rem;
     font-weight: 500;
@@ -930,7 +1037,7 @@ input[type="password"],
 }
 
 .hamburger-menu-content {
-    background: white;
+    background: var(--bg-card);
     width: 280px;
     height: 100%;
     box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
@@ -984,11 +1091,11 @@ input[type="password"],
     cursor: pointer;
     transition: background 0.2s;
     font-size: 1rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border);
 }
 
 .hamburger-item:hover {
-    background: #f8fafc;
+    background: var(--bg-main);
 }
 
 .hamburger-item span:first-child {
@@ -1027,6 +1134,9 @@ input[type="password"],
 /* Collapsible Store Lists */
 .store-card {
     margin-bottom: 12px;
+    border-left: 4px solid transparent;
+    transition: border-color 0.3s;
+    overflow: hidden;
 }
 
 .store-header {
@@ -1040,7 +1150,7 @@ input[type="password"],
     user-select: none;
     -webkit-tap-highlight-color: rgba(8, 145, 178, 0.1);
     touch-action: manipulation;
-    background: linear-gradient(90deg, #ffffff 0%, #f8fafc 100%);
+    background: linear-gradient(90deg, var(--bg-card) 0%, var(--bg-main) 100%);
 }
 
 .store-header:active {
@@ -1054,18 +1164,18 @@ input[type="password"],
 .store-title {
     font-weight: 600;
     font-size: 1.1rem;
-    color: #0f172a;
+    color: var(--text-primary);
     margin-bottom: 4px;
 }
 
 .store-subtitle {
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--text-secondary);
 }
 
 .store-chevron {
     font-size: 1.5rem;
-    color: #0891B2;
+    color: var(--primary);
     transition: transform 0.3s;
     font-weight: 700;
 }
@@ -1077,7 +1187,7 @@ input[type="password"],
 .store-content {
     overflow: hidden;
     transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
-    background: #f8fafc;
+    background: var(--bg-main);
 }
 
 .store-content.collapsed {
@@ -1090,7 +1200,7 @@ input[type="password"],
     max-height: 2000px;
     opacity: 1;
     padding: 16px;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border);
 }
 
 .store-actions {

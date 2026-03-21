@@ -17,7 +17,7 @@
     <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="./style.css">
     
-  <script type="module" crossorigin src="./assets/index-CIbqv6KR.js"></script>
+  <script type="module" crossorigin src="./assets/index-DW0q5Gdn.js"></script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -233,19 +233,14 @@
         <button class="fab-btn" id="fab-add-btn">+</button>
 
         <!-- Add Item Modal -->
-        <div class="modal-overlay" id="add-modal">
-            <div class="modal" style="max-height: 90vh; overflow-y: auto;">
-                <div class="modal-header">
+        <div class="modal-overlay bottom-sheet" id="add-modal">
+            <div class="modal">
+                <div class="modal-header" style="display:flex; align-items:center; justify-content:space-between;">
                     <h3 class="modal-title" id="add-modal-title">Add Items</h3>
+                    <button id="modal-close-x-btn" class="sheet-close-btn" aria-label="Close">✕</button>
                 </div>
                 <div class="modal-body">
-                    <!-- Store selector always visible at top -->
-                    <div class="input-group">
-                        <label>Add to Stores</label>
-                        <div class="store-selector" id="modal-store-selector"></div>
-                    </div>
-
-                    <!-- Item name + qty + add button -->
+                    <!-- Item name -->
                     <div class="input-group">
                         <label>Item Name</label>
                         <div class="input-with-autocomplete">
@@ -253,19 +248,30 @@
                             <div class="autocomplete-dropdown" id="modal-item-name-autocomplete"></div>
                         </div>
                     </div>
+
+                    <!-- Qty + Add row -->
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
                         <div style="display:flex; align-items:center; gap:12px;">
                             <button class="qty-add-btn" id="modal-qty-minus" type="button">−</button>
                             <span id="modal-quantity-display" style="font-size:1.5rem; font-weight:700; min-width:40px; text-align:center; color:var(--primary);">1</span>
                             <button class="qty-add-btn" id="modal-qty-plus" type="button">+</button>
                         </div>
-                        <button class="btn btn-primary" id="modal-add-btn" style="padding:10px 22px; font-size:0.95rem;">+ Add</button>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span id="modal-add-feedback" class="modal-add-feedback">✓ Added</span>
+                            <button class="btn btn-primary" id="modal-add-btn" style="padding:10px 22px; font-size:0.95rem;">+ Add</button>
+                        </div>
                     </div>
 
                     <!-- Pending items list (hidden until items added) -->
                     <div id="modal-pending-section" style="display:none;">
                         <div style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;">Items to Add <span id="modal-pending-count" style="color:var(--primary);"></span></div>
                         <div id="modal-pending-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+                    </div>
+
+                    <!-- Store selector -->
+                    <div class="input-group" style="margin-top:4px;">
+                        <label>Add to Stores</label>
+                        <div class="store-selector" id="modal-store-selector"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
